@@ -1,0 +1,413 @@
+
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { Search, RefreshCw, ArrowUpRight, Plug, AlertTriangle } from "lucide-react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from "recharts";
+
+/* ================================================================== *
+ *  AUTOMATION INTAKE — Control Board · RCCB IT
+ *
+ *  No data is hardcoded. Records come from a SharePoint list.
+ *  Wire it up in two spots below:
+ *    1. LIST_NAME       — your list's display name
+ *    2. mapItem(spItem) — map SP column names -> the shape we use
+ *
+ *  Record shape after mapping:
+ *    { id, title, requester, team, lead, status, submitted }
+ *    status ∈ "New" | "In Progress" | "On Hold" | "Completed"
+ * ================================================================== */
+
+const LIST_NAME = "Automation Requests";
+
+// SharePoint REST → our shape. Rename the right-hand SP fields to match
+// your list's *internal* column names (and keep them in $select below).
+function mapItem(it) {
+  return {
+    id:        it.Id,
+    title:     it.Title || "Untitled request",
+    requester: it.Requester || "—",
+    team:      it.Team || "—",
+    lead:      it.ProjectLead || "—",
+    status:    it.Status || "New",
+    submitted: it.Created, // ISO string; formatted on display
+  };
+}
+
+async function fetchRequests() {
+  const FLOW_URL = "https://a477fe69c32a4af79331a1752086c6.34.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a1a2a818907c499992855167195cb1e6/triggers/manual/paths/invoke?api-version=1";
+
+  const res = await fetch(FLOW_URL, {
+    method: "POST", // always POST for Power Automate HTTP trigger
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}) // empty since you're just "GetRecords"
+  });
+
+  if (!res.ok) throw new Error(`Flow responded ${res.status}`);
+
+  const data = await res.json();
+
+  // Expecting { value: [...] }
+  return (data.value || []).map(mapItem);
+}
+
+/* ---------------------------------------------------------------- */
+
+const STAGES = ["New", "In Progress", "On Hold", "Completed"];
+const HUE = {
+  New:           "#60a5fa",
+  "In Progress": "#a78bfa",
+  "On Hold":     "#f59e0b",
+  Completed:     "#34d399",
+};
+const SIGNAL = "#ff5638"; // reserved: live indicator + moving pulse only
+const MONO = { fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" };
+
+const fmtDate = (v) => {
+  if (!v) return "—";
+  const d = new Date(v);
+  return isNaN(d) ? String(v) : d.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
+};
+const initials = (n) =>
+  (n || "?").split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+
+/* ---- Hero: the conveyor / control board -------------------------- */
+
+function Readout({ k, v, accent }) {
+  return (
+    <div className="flex items-baseline gap-2">
+      <span style={MONO} className="text-[10px] uppercase tracking-[0.18em] text-slate-500">{k}</span>
+      <span style={{ ...MONO, color: accent || "#fff" }} className="text-sm font-semibold tabular-nums">{v}</span>
+    </div>
+  );
+}
+
+function ControlBoard({ counts, total, clock }) {
+  const open = (counts.New || 0) + (counts["In Progress"] || 0) + (counts["On Hold"] || 0);
+  return (
+    <header
+      className="relative overflow-hidden border-b"
+      style={{
+        background: "radial-gradient(120% 140% at 12% -10%, #1a1f2b 0%, #0b0d12 55%)",
+        borderColor: "rgba(255,255,255,.08)",
+      }}
+    >
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          maskImage: "linear-gradient(to bottom, #000 30%, transparent 95%)",
+          WebkitMaskImage: "linear-gradient(to bottom, #000 30%, transparent 95%)",
+        }}
+      />
+      <div className="relative mx-auto w-full max-w-7xl px-5 pb-10 pt-7 md:px-8">
+        <div className="flex items-center justify-between">
+          <span style={MONO} className="text-[11px] uppercase tracking-[0.28em] text-slate-400">
+            RCCB · IT&nbsp;Automation
+          </span>
+          <div className="flex items-center gap-4">
+            <span style={MONO} className="hidden text-[11px] tracking-widest text-slate-500 sm:inline">{clock}</span>
+            <span className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1"
+                  style={{ borderColor: "rgba(255,86,56,.35)" }}>
+              <span className="hub-pulse size-1.5 rounded-full" style={{ background: SIGNAL }} />
+              <span style={MONO} className="text-[10px] uppercase tracking-[0.2em] text-slate-300">LIVE</span>
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-7 max-w-2xl">
+          <h1 className="text-3xl font-semibold leading-[1.05] tracking-tight text-white md:text-[2.7rem]">
+            Intake Control Board
+          </h1>
+          <p className="mt-2.5 text-sm leading-relaxed text-slate-400">
+            Every automation request the team takes in — from first submission to shipped —
+            moving across one board.
+          </p>
+        </div>
+
+        {/* conveyor */}
+        <div className="relative mt-9">
+          <div className="absolute left-0 right-0 h-px" style={{ top: 22, background: "rgba(255,255,255,.12)" }} />
+          <div className="absolute left-0 right-0 overflow-hidden" style={{ top: 22, height: 1 }}>
+            <div className="hub-sweep" style={{ height: 1, width: 96, background: `linear-gradient(90deg, transparent, ${SIGNAL}, transparent)` }} />
+          </div>
+
+          <div className="relative grid grid-cols-2 gap-y-8 md:grid-cols-4">
+            {STAGES.map((s) => (
+              <div key={s} className="flex flex-col items-center text-center">
+                <span className="grid size-11 place-items-center rounded-full border"
+                      style={{ background: "#0b0d12", borderColor: HUE[s] + "66" }}>
+                  <span className="size-2.5 rounded-full" style={{ background: HUE[s] }} />
+                </span>
+                <span style={MONO} className="mt-3 text-2xl font-semibold tabular-nums text-white">
+                  {String(counts[s] ?? 0).padStart(2, "0")}
+                </span>
+                <span style={MONO} className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-slate-400">{s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-2 border-t pt-4"
+             style={{ borderColor: "rgba(255,255,255,.08)" }}>
+          <Readout k="Total intake" v={String(total).padStart(2, "0")} />
+          <Readout k="Open" v={String(open).padStart(2, "0")} />
+          <Readout k="Shipped" v={String(counts.Completed || 0).padStart(2, "0")} accent={HUE.Completed} />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+/* ---- Status pill ------------------------------------------------- */
+function Pill({ status }) {
+  const c = HUE[status] || "#94a3b8";
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap"
+          style={{ borderColor: c + "55", color: "#334155", background: c + "12" }}>
+      <span className="size-1.5 rounded-full" style={{ background: c }} />
+      {status}
+    </span>
+  );
+}
+
+/* ---- States ----------------------------------------------------- */
+function Skeleton() {
+  return (
+    <div>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-5 py-3.5">
+          <div className="size-9 shrink-0 rounded-lg bg-slate-100" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3 w-1/3 rounded bg-slate-100" />
+            <div className="h-2.5 w-1/2 rounded bg-slate-100" />
+          </div>
+          <div className="h-5 w-20 rounded-full bg-slate-100" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EmptyConnect({ onRetry, error }) {
+  return (
+    <div className="px-6 py-16 text-center">
+      <div className="mx-auto grid size-12 place-items-center rounded-xl" style={{ background: error ? "#fef2f2" : "#f1f5f9" }}>
+        {error ? <AlertTriangle className="size-6 text-rose-500" /> : <Plug className="size-6 text-slate-400" />}
+      </div>
+      <h3 className="mt-4 text-base font-semibold text-slate-900">
+        {error ? "Couldn’t reach the list" : "Waiting on your SharePoint list"}
+      </h3>
+      <p className="mx-auto mt-1.5 max-w-md text-sm text-slate-500">
+        {error
+          ? <>The board is wired up but the request to <span style={MONO}>{LIST_NAME}</span> failed. Check the list name, your column mappings, and that you’re signed in.</>
+          : <>Once <span style={MONO}>“{LIST_NAME}”</span> returns items they land here automatically — no records are stored in this app.</>}
+      </p>
+      <button onClick={onRetry}
+              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700">
+        <RefreshCw className="size-4" /> {error ? "Try again" : "Refresh"}
+      </button>
+    </div>
+  );
+}
+
+/* ================================================================== */
+
+export default function AutomationHub() {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [q, setQ] = useState("");
+  const [filter, setFilter] = useState("All");
+  const [clock, setClock] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true); setError(false);
+    try {
+      setRequests(await fetchRequests());
+    } catch (e) {
+      console.error(e); setError(true); setRequests([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    const tick = () => setClock(
+      new Date().toLocaleString("en-US", { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" }).toUpperCase()
+    );
+    tick();
+    const t = setInterval(tick, 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  const counts = useMemo(() => {
+    const c = { New: 0, "In Progress": 0, "On Hold": 0, Completed: 0 };
+    requests.forEach((r) => { if (c[r.status] != null) c[r.status]++; });
+    return c;
+  }, [requests]);
+
+  const byTeam = useMemo(() => {
+    const m = {};
+    requests.forEach((r) => { m[r.team] = (m[r.team] || 0) + 1; });
+    return Object.entries(m).map(([team, n]) => ({ team, n })).sort((a, b) => b.n - a.n).slice(0, 7);
+  }, [requests]);
+
+  const rows = useMemo(() => {
+    let list = requests;
+    if (filter !== "All") list = list.filter((r) => r.status === filter);
+    if (q.trim()) {
+      const t = q.toLowerCase();
+      list = list.filter((r) => (r.title + r.requester + r.team + r.lead).toLowerCase().includes(t));
+    }
+    return list;
+  }, [requests, q, filter]);
+
+  const hasData = requests.length > 0;
+
+  return (
+    <div className="min-h-svh bg-slate-50 font-sans text-slate-900">
+      <style>{`
+        @keyframes hubSweep { 0%{transform:translateX(-120px)} 100%{transform:translateX(120vw)} }
+        @keyframes hubPulse { 0%,100%{opacity:.35} 50%{opacity:1} }
+        .hub-pulse { animation: hubPulse 1.6s ease-in-out infinite; }
+        .hub-sweep { animation: hubSweep 5s linear infinite; }
+        @media (prefers-reduced-motion: reduce){ .hub-pulse,.hub-sweep{ animation: none !important; } }
+      `}</style>
+
+      <ControlBoard counts={counts} total={requests.length} clock={clock} />
+
+      <main className="mx-auto w-full max-w-7xl space-y-5 px-5 py-7 md:px-8">
+        {hasData && (
+          <section className="grid gap-5 lg:grid-cols-5">
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-3">
+              <div className="flex items-baseline justify-between">
+                <h2 className="text-sm font-semibold tracking-tight text-slate-900">Intake by team</h2>
+                <span style={MONO} className="text-[11px] text-slate-400">{requests.length} total</span>
+              </div>
+              <div className="mt-4" style={{ height: 196 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={byTeam} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
+                    <CartesianGrid vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="team" tick={{ fontSize: 11, fill: "#64748b" }} tickLine={false} axisLine={false}
+                           interval={0} angle={-12} textAnchor="end" height={46} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} />
+                    <Tooltip cursor={{ fill: "#f8fafc" }}
+                             contentStyle={{ borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 12 }} />
+                    <Bar dataKey="n" name="Requests" radius={[5, 5, 0, 0]} fill="#1f2430" maxBarSize={38} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
+              <h2 className="text-sm font-semibold tracking-tight text-slate-900">Status mix</h2>
+              <ul className="mt-4 space-y-3">
+                {STAGES.map((s) => {
+                  const pct = requests.length ? Math.round((counts[s] / requests.length) * 100) : 0;
+                  return (
+                    <li key={s}>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-medium text-slate-600">{s}</span>
+                        <span style={MONO} className="tabular-nums text-slate-400">{counts[s]} · {pct}%</span>
+                      </div>
+                      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                        <div className="h-full rounded-full" style={{ width: pct + "%", background: HUE[s] }} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </section>
+        )}
+
+        <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold tracking-tight text-slate-900">Requests</h2>
+              <button onClick={load} title="Refresh from SharePoint"
+                      className="grid size-7 place-items-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
+                <RefreshCw className={"size-3.5 " + (loading ? "animate-pulse" : "")} />
+              </button>
+            </div>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…"
+                     className="w-44 rounded-lg border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-3 text-xs outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 focus:bg-white" />
+            </div>
+          </div>
+
+          {hasData && (
+            <div className="flex flex-wrap gap-1.5 px-5 py-3">
+              {["All", ...STAGES].map((s) => {
+                const on = filter === s;
+                return (
+                  <button key={s} onClick={() => setFilter(s)}
+                          className="rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+                          style={on ? { background: "#0b0d12", color: "#fff", borderColor: "#0b0d12" }
+                                    : { background: "#fff", color: "#475569", borderColor: "#e2e8f0" }}>
+                    {s}{s !== "All" && <span style={MONO} className="ml-1.5 opacity-60">{counts[s] ?? 0}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {loading ? <Skeleton />
+            : !hasData ? <EmptyConnect onRetry={load} error={error} />
+            : rows.length === 0 ? (
+              <div className="px-6 py-12 text-center text-sm text-slate-500">
+                Nothing matches that view. Clear the search or pick a different status.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px] border-collapse text-left">
+                  <thead>
+                    <tr className="border-b border-slate-100" style={MONO}>
+                      {["Request", "Requester / Team", "Lead", "Status", "Submitted"].map((h) => (
+                        <th key={h} className="px-5 py-2.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.id} className="border-b border-slate-50 transition-colors hover:bg-slate-50">
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-3">
+                            <span className="grid size-8 shrink-0 place-items-center rounded-lg text-[10px] font-bold text-slate-600" style={{ background: "#f1f5f9" }}>
+                              {initials(r.requester)}
+                            </span>
+                            <span className="text-sm font-medium text-slate-900">{r.title}</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3 text-xs text-slate-500">
+                          <div className="text-slate-700">{r.requester}</div>
+                          <div>{r.team}</div>
+                        </td>
+                        <td className="px-5 py-3 text-xs text-slate-600">{r.lead}</td>
+                        <td className="px-5 py-3"><Pill status={r.status} /></td>
+                        <td className="px-5 py-3 text-xs tabular-nums text-slate-400" style={MONO}>{fmtDate(r.submitted)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+          {hasData && (
+            <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-xs text-slate-400">
+              <span style={MONO}>{rows.length} shown · {requests.length} total</span>
+              <span className="inline-flex items-center gap-1">Source: SharePoint <ArrowUpRight className="size-3" /></span>
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
+}
