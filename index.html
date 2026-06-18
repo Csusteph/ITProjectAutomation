@@ -1,3 +1,351 @@
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { Search, RefreshCw, ArrowUpRight, Plug, AlertTriangle } from "lucide-react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+} from "recharts";
+
+/* ================================================================== *
+ *  AUTOMATION INTAKE — Control Board · RCCB IT
+ *
+ *  HOW TO WIRE UP:
+ *  1. Build your Power Automate Flow (see flow guide below)
+ *  2. Paste the full HTTP trigger URL into FLOW_URL
+ *  3. Update mapItem() so the field names match your SharePoint
+ *     list's *internal* column names (not display names).
+ *
+ *  POWER AUTOMATE FLOW SETUP:
+ *  ─────────────────────────────────────────────────────────────────
+ *  Trigger:  "When an HTTP request is received"
+ *            Method: POST   (leave "Request Body JSON Schema" blank)
+ *
+ *  Step 1:   "Get items" (SharePoint connector)
+ *            Site Address : your SharePoint site URL
+ *            List Name    : Automation Requests
+ *            Top Count    : 500   (or use Pagination in Settings)
+ *            Select Columns (optional but recommended):
+ *              Id,Title,Requester,Team,ProjectLead,Status,Created
+ *
+ *  Step 2:   "Response" (built-in)
+ *            Status Code  : 200
+ *            Headers      : Content-Type  →  application/json
+ *            Body         : (paste exactly, with the dynamic expression)
+ *
+ *              {
+ *                "value": @{outputs('Get_items')?['body/value']}
+ *              }
+ *
+ *            ⚠  In the Body field, after typing `"value": ` click
+ *               "Expression" and enter:
+ *                 outputs('Get_items')?['body/value']
+ *               The action internal name ('Get_items') must match what
+ *               Power Automate shows — check it in the action title bar.
+ *
+ *  CORS: If the app runs outside SharePoint/Teams you may need to add
+ *        an "Allow-Origin" header in the Response step:
+ *          Access-Control-Allow-Origin  →  *
+ *
+ *  FLOW URL: After saving the Flow, open the HTTP trigger step and
+ *  copy the full URL — it includes ?api-version=...&sp=...&sv=...&sig=...
+ *  Those query params ARE the auth token; don't strip them.
+ *  ─────────────────────────────────────────────────────────────────
+ *
+ *  SHAREPOINT INTERNAL COLUMN NAMES:
+ *  Go to List Settings → click a column → read "Field=" from the URL.
+ *  Common differences from display name:
+ *    "Project Lead"  → ProjectLead  OR  Project_x0020_Lead
+ *    "Sub-Team"      → Sub_x002D_Team
+ *    "Status"        → Status  (usually fine)
+ * ================================================================== */
+
+// ── 1. PASTE YOUR FULL FLOW URL HERE ─────────────────────────────────────────
+const FLOW_URL =
+  "https://a477fe69c32a4af79331a1752086c6.34.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a1a2a818907c499992855167195cb1e6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=L4dmM-57GdhVLTSDxZGwJ8FzJ5PwWfZq1ZKgfp54EVM";
+
+// ── 2. MAP SHAREPOINT FIELDS → APP SHAPE ─────────────────────────────────────
+//  Right-hand side = SharePoint internal field names from your list.
+//  status must be one of: "New" | "In Progress" | "On Hold" | "Completed"
+function mapItem(it) {
+  return {
+    id:        it.Id,
+    title:     it.Title           || "Untitled request",
+    requester: it.Requester       || "—",
+    team:      it.Team            || "—",
+    lead:      it.ProjectLead     || "—",   // ← check internal name in SP
+    status:    it.Status          || "New",
+    submitted: it.Created,                  // ISO date string from SP
+  };
+}
+
+// ── FETCH ─────────────────────────────────────────────────────────────────────
+async function fetchRequests() {
+  const res = await fetch(FLOW_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(
+      `Flow responded ${res.status}${detail ? " — " + detail.slice(0, 200) : ""}`
+    );
+  }
+
+  const data = await res.json();
+
+  // If your Flow wraps results differently (e.g. data.items or data.d.results)
+  // update the line below to match.
+  return (data.value || []).map(mapItem);
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+
+const STAGES = ["New", "In Progress", "On Hold", "Completed"];
+const HUE = {
+  New:           "#60a5fa",
+  "In Progress": "#a78bfa",
+  "On Hold":     "#f59e0b",
+  Completed:     "#34d399",
+};
+const SIGNAL = "#ff5638";
+const MONO = { fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" };
+
+const fmtDate = (v) => {
+  if (!v) return "—";
+  const d = new Date(v);
+  return isNaN(d) ? String(v) : d.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
+};
+const initials = (n) =>
+  (n || "?").split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+
+/* ── Hero control board ───────────────────────────────────────────── */
+
+function Readout({ k, v, accent }) {
+  return (
+    <div className="flex items-baseline gap-2">
+      <span style={MONO} className="text-[10px] uppercase tracking-[0.18em] text-slate-500">{k}</span>
+      <span style={{ ...MONO, color: accent || "#fff" }} className="text-sm font-semibold tabular-nums">{v}</span>
+    </div>
+  );
+}
+
+function ControlBoard({ counts, total, clock }) {
+  const open = (counts.New || 0) + (counts["In Progress"] || 0) + (counts["On Hold"] || 0);
+  return (
+    <header
+      className="relative overflow-hidden border-b"
+      style={{
+        background: "radial-gradient(120% 140% at 12% -10%, #1a1f2b 0%, #0b0d12 55%)",
+        borderColor: "rgba(255,255,255,.08)",
+      }}
+    >
+      {/* grid overlay */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          maskImage: "linear-gradient(to bottom, #000 30%, transparent 95%)",
+          WebkitMaskImage: "linear-gradient(to bottom, #000 30%, transparent 95%)",
+        }}
+      />
+
+      <div className="relative mx-auto w-full max-w-7xl px-5 pb-10 pt-7 md:px-8">
+        {/* top bar */}
+        <div className="flex items-center justify-between">
+          <span style={MONO} className="text-[11px] uppercase tracking-[0.28em] text-slate-400">
+            RCCB · IT&nbsp;Automation
+          </span>
+          <div className="flex items-center gap-4">
+            <span style={MONO} className="hidden text-[11px] tracking-widest text-slate-500 sm:inline">{clock}</span>
+            <span
+              className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1"
+              style={{ borderColor: "rgba(255,86,56,.35)" }}
+            >
+              <span className="hub-pulse size-1.5 rounded-full" style={{ background: SIGNAL }} />
+              <span style={MONO} className="text-[10px] uppercase tracking-[0.2em] text-slate-300">LIVE</span>
+            </span>
+          </div>
+        </div>
+
+        {/* title */}
+        {/* readouts */}
+        <div
+          className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-2 border-t pt-4"
+          style={{ borderColor: "rgba(255,255,255,.08)" }}
+        >
+          <Readout k="Total intake" v={String(total).padStart(2, "0")} />
+          <Readout k="Open" v={String(open).padStart(2, "0")} />
+          <Readout k="Shipped" v={String(counts.Completed || 0).padStart(2, "0")} accent={HUE.Completed} />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+/* ── Status pill ─────────────────────────────────────────────────── */
+function Pill({ status }) {
+  const c = HUE[status] || "#94a3b8";
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap"
+      style={{ borderColor: c + "55", color: "#334155", background: c + "12" }}
+    >
+      <span className="size-1.5 rounded-full" style={{ background: c }} />
+      {status}
+    </span>
+  );
+}
+
+/* ── Loading skeleton ─────────────────────────────────────────────── */
+function Skeleton() {
+  return (
+    <div>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-5 py-3.5">
+          <div className="size-9 shrink-0 rounded-lg bg-slate-100" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3 w-1/3 rounded bg-slate-100" />
+            <div className="h-2.5 w-1/2 rounded bg-slate-100" />
+          </div>
+          <div className="h-5 w-20 rounded-full bg-slate-100" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Empty / error state ──────────────────────────────────────────── */
+function EmptyConnect({ onRetry, error, errorMsg }) {
+  return (
+    <div className="px-6 py-16 text-center">
+      <div
+        className="mx-auto grid size-12 place-items-center rounded-xl"
+        style={{ background: error ? "#fef2f2" : "#f1f5f9" }}
+      >
+        {error
+          ? <AlertTriangle className="size-6 text-rose-500" />
+          : <Plug className="size-6 text-slate-400" />}
+      </div>
+      <h3 className="mt-4 text-base font-semibold text-slate-900">
+        {error ? "Couldn't reach the list" : "Waiting on your SharePoint list"}
+      </h3>
+      <p className="mx-auto mt-1.5 max-w-md text-sm text-slate-500">
+        {error ? (
+          <>
+            {errorMsg || "Check the Flow URL, authentication, and that mapItem() column names match your SharePoint list's internal column names."}
+          </>
+        ) : (
+          <>Once the Flow is wired up and returns items they land here automatically.</>
+        )}
+      </p>
+      <button
+        onClick={onRetry}
+        className="mt-5 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+      >
+        <RefreshCw className="size-4" /> {error ? "Try again" : "Refresh"}
+      </button>
+    </div>
+  );
+}
+
+/* ================================================================== */
+
+export default function AutomationHub() {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [q, setQ]               = useState("");
+  const [filter, setFilter]     = useState("All");
+  const [clock, setClock]       = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true); setError(false); setErrorMsg("");
+    try {
+      setRequests(await fetchRequests());
+    } catch (e) {
+      console.error(e);
+      setError(true);
+      setErrorMsg(e.message || "");
+        {/* Charts */}
+        {/* Requests table */}
+                    {s !== "All" && (
+                      <span style={MONO} className="ml-1.5 opacity-60">{counts[s] ?? 0}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {loading ? (
+            <Skeleton />
+          ) : !hasData ? (
+            <EmptyConnect onRetry={load} error={error} errorMsg={errorMsg} />
+          ) : rows.length === 0 ? (
+            <div className="px-6 py-12 text-center text-sm text-slate-500">
+              Nothing matches that view. Clear the search or pick a different status.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-slate-100" style={MONO}>
+                    {["Request", "Requester / Team", "Lead", "Status", "Submitted"].map((h) => (
+                      <th key={h} className="px-5 py-2.5 text-[10px] font-medium uppercase tracking-wider text-slate-400">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr key={r.id} className="border-b border-slate-50 transition-colors hover:bg-slate-50">
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-3">
+                          <span
+                            className="grid size-8 shrink-0 place-items-center rounded-lg text-[10px] font-bold text-slate-600"
+                            style={{ background: "#f1f5f9" }}
+                          >
+                            {initials(r.requester)}
+                          </span>
+                          <span className="text-sm font-medium text-slate-900">{r.title}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3 text-xs text-slate-500">
+                        <div className="text-slate-700">{r.requester}</div>
+                        <div>{r.team}</div>
+                      </td>
+                      <td className="px-5 py-3 text-xs text-slate-600">{r.lead}</td>
+                      <td className="px-5 py-3"><Pill status={r.status} /></td>
+                      <td className="px-5 py-3 text-xs tabular-nums text-slate-400" style={MONO}>
+                        {fmtDate(r.submitted)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {hasData && (
+            <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 text-xs text-slate-400">
+              <span style={MONO}>{rows.length} shown · {requests.length} total</span>
+              <span className="inline-flex items-center gap-1">
+                Source: SharePoint <ArrowUpRight className="size-3" />
+              </span>
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
+}
+Sent from my iPhone
+
+On Jun 17, 2026, at 9:18 PM, stephanie brower <csusteph@gmail.com> wrote:
 
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { Search, RefreshCw, ArrowUpRight, Plug, AlertTriangle } from "lucide-react";
