@@ -1,106 +1,66 @@
 <!DOCTYPE html>
-<html lang="en"<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>J.A.R.V.I.S. · Intake Control Board · RCCB IT</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:ital,wght@0,400;0,500&display=swap');
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:      #0b0d12;
-      --card:    #11141b;
-      --card2:   #1a1f2b;
-      --border:  rgba(255,255,255,.08);
-      --border2: rgba(255,255,255,.12);
-      --text:    #e2e8f0;
-      --muted:   #94a3b8;
-      --dim:     #64748b;
-      --signal:  #ff5638;
-      --blue:    #60a5fa;
-      --purple:  #a78bfa;
-      --amber:   #f59e0b;
-      --green:   #34d399;
+      --bg:     #0b0d12;
+      --card:   #11141b;
+      --border: rgba(255,255,255,.08);
+      --border2:rgba(255,255,255,.12);
+      --text:   #e2e8f0;
+      --muted:  #94a3b8;
+      --dim:    #64748b;
+      --signal: #ff5638;
+      --blue:   #60a5fa;
+      --purple: #a78bfa;
+      --amber:  #f59e0b;
+      --green:  #34d399;
       --sans: 'Inter', system-ui, sans-serif;
       --mono: 'DM Mono', ui-monospace, monospace;
     }
 
     html, body { background: var(--bg); color: var(--text); }
-    body {
-      font-family: var(--sans);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
+    body { font-family: var(--sans); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-    /* ─── scrollbar ─────────────────────── */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--card); }
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #334155; }
 
-    /* ─── keyframes ─────────────────────── */
-    @keyframes hubSweep {
-      0%   { transform: translateX(-200px); }
-      100% { transform: translateX(110vw); }
-    }
-    @keyframes hubPulse {
-      0%, 100% { opacity: .3; transform: scale(1); }
-      50%       { opacity: 1;  transform: scale(1.3); }
-    }
-    @keyframes hubGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,86,56,.7); }
-      50%       { box-shadow: 0 0 0 6px rgba(255,86,56,0); }
-    }
-    @keyframes topBar {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    @keyframes auroraDrift {
-      0%   { transform: translate3d(0,0,0) scale(1); }
-      100% { transform: translate3d(-4%,2%,0) scale(1.05); }
-    }
-    @keyframes eqBar {
-      0%, 100% { transform: scaleY(.25); }
-      50%       { transform: scaleY(1); }
-    }
-    @keyframes ripple {
-      0%   { transform: scale(1); opacity: .7; }
-      100% { transform: scale(2.3); opacity: 0; }
-    }
-    @keyframes spinSlow { to { transform: rotate(360deg); } }
-    @keyframes particle {
-      0%   { transform: translate(0,0); opacity: 0; }
-      20%  { opacity: 1; }
-      100% { transform: translate(40px,-60px); opacity: 0; }
-    }
-    @keyframes shimmer {
-      0%   { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-    @keyframes marquee { to { transform: translateX(-50%); } }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes skelpulse { 0%,100%{opacity:.4} 50%{opacity:.9} }
-    @keyframes orbPing {
-      75%, 100% { transform: scale(2); opacity: 0; }
-    }
+    /* ── animations ── */
+    @keyframes hubSweep   { 0%{transform:translateX(-200px)} 100%{transform:translateX(110vw)} }
+    @keyframes hubPulse   { 0%,100%{opacity:.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
+    @keyframes hubGlow    { 0%,100%{box-shadow:0 0 0 0 rgba(255,86,56,.7)} 50%{box-shadow:0 0 0 6px rgba(255,86,56,0)} }
+    @keyframes topBar     { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    @keyframes auroraDrift{ 0%{transform:translate3d(0,0,0) scale(1)} 100%{transform:translate3d(-4%,2%,0) scale(1.05)} }
+    @keyframes eqBar      { 0%,100%{transform:scaleY(.25)} 50%{transform:scaleY(1)} }
+    @keyframes ripple     { 0%{transform:scale(1);opacity:.7} 100%{transform:scale(2.3);opacity:0} }
+    @keyframes spinSlow   { to{transform:rotate(360deg)} }
+    @keyframes particle   { 0%{transform:translate(0,0);opacity:0} 20%{opacity:1} 100%{transform:translate(40px,-60px);opacity:0} }
+    @keyframes shimmer    { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+    @keyframes marquee    { to{transform:translateX(-50%)} }
+    @keyframes fadeInUp   { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes skelpulse  { 0%,100%{opacity:.4} 50%{opacity:.9} }
+    @keyframes orbPing    { 75%,100%{transform:scale(2);opacity:0} }
 
-    .hub-pulse  { animation: hubPulse 1.4s ease-in-out infinite, hubGlow 1.4s ease-in-out infinite; }
-    .hub-sweep  { animation: hubSweep 3.5s linear infinite; }
-    .spin-slow  { animation: spinSlow 18s linear infinite; }
-    .ripple-ring{ animation: ripple 2.4s ease-out infinite; }
-    .eq-bar     { transform-origin: bottom; animation: eqBar 1s ease-in-out infinite; }
-    .particle   { animation: particle 6s ease-out infinite; }
-    .fade-in-up { animation: fadeInUp 400ms ease-out both; }
-    .marquee    { animation: marquee 40s linear infinite; }
-    .orb-ping   { animation: orbPing 2.4s cubic-bezier(0,0,.2,1) infinite; }
+    .hub-pulse   { animation: hubPulse 1.4s ease-in-out infinite, hubGlow 1.4s ease-in-out infinite; }
+    .hub-sweep   { animation: hubSweep 3.5s linear infinite; }
+    .spin-slow   { animation: spinSlow 18s linear infinite; }
+    .ripple-ring { animation: ripple 2.4s ease-out infinite; }
+    .eq-bar      { transform-origin: bottom; animation: eqBar 1s ease-in-out infinite; }
+    .particle    { animation: particle 6s ease-out infinite; }
+    .fade-in-up  { animation: fadeInUp 400ms ease-out both; }
+    .marquee     { animation: marquee 40s linear infinite; }
+    .orb-ping    { animation: orbPing 2.4s cubic-bezier(0,0,.2,1) infinite; }
+
     .shimmer-text {
       background: linear-gradient(90deg,#fff 0%,#fff 35%,rgba(255,86,56,.95) 50%,#fff 65%,#fff 100%);
       background-size: 200% 100%;
@@ -108,9 +68,7 @@
       -webkit-text-fill-color: transparent;
       animation: shimmer 6s linear infinite;
     }
-    .lift {
-      transition: transform 220ms cubic-bezier(.2,0,.2,1), box-shadow 220ms, border-color 220ms;
-    }
+    .lift { transition: transform 220ms cubic-bezier(.2,0,.2,1), box-shadow 220ms, border-color 220ms; }
     .lift:hover {
       transform: translateY(-2px);
       box-shadow: 0 12px 32px -12px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
@@ -121,35 +79,22 @@
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
 
-    /* ─── sticky nav ────────────────────── */
+    /* ── nav ── */
     #site-nav {
       position: sticky; top: 0; z-index: 30;
       background: rgba(11,13,18,.9);
-      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
     }
     .nav-inner {
-      max-width: 1100px; margin: 0 auto;
-      padding: 0 24px;
-      height: 48px;
-      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      height: 48px; display: flex; align-items: center; justify-content: space-between;
     }
-    .nav-brand {
-      display: flex; align-items: center; gap: 8px;
-      text-decoration: none;
-    }
-    .nav-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--signal);
-      box-shadow: 0 0 6px var(--signal);
-    }
-    .nav-label {
-      font-family: var(--mono);
-      font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
-      color: var(--text);
-    }
+    .nav-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .nav-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 6px var(--signal); }
+    .nav-label { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--text); }
 
-    /* ─── hero header ───────────────────── */
+    /* ── hero ── */
     #board-header {
       position: relative; overflow: hidden;
       background: radial-gradient(120% 140% at 12% -10%, #1a1f2b 0%, #0b0d12 55%);
@@ -157,57 +102,38 @@
     }
     .top-bar-line {
       position: absolute; top: 0; left: 0; right: 0; height: 2px; z-index: 2;
-      background: linear-gradient(90deg, transparent, var(--signal), transparent);
-      background-size: 200% 100%;
-      animation: topBar 4s linear infinite;
+      background: linear-gradient(90deg,transparent,var(--signal),transparent);
+      background-size: 200% 100%; animation: topBar 4s linear infinite;
     }
     .hero-aurora {
-      position: absolute;
-      inset: -20% -10% auto -10%; height: 70%;
+      position: absolute; inset: -20% -10% auto -10%; height: 70%;
       background:
-        radial-gradient(40% 60% at 20% 30%, rgba(96,165,250,.18) 0%, transparent 70%),
-        radial-gradient(35% 55% at 80% 20%, rgba(167,139,250,.16) 0%, transparent 70%),
-        radial-gradient(30% 50% at 50% 80%, rgba(255,86,56,.10) 0%, transparent 70%);
+        radial-gradient(40% 60% at 20% 30%,rgba(96,165,250,.18) 0%,transparent 70%),
+        radial-gradient(35% 55% at 80% 20%,rgba(167,139,250,.16) 0%,transparent 70%),
+        radial-gradient(30% 50% at 50% 80%,rgba(255,86,56,.10) 0%,transparent 70%);
       filter: blur(40px);
       animation: auroraDrift 14s ease-in-out infinite alternate;
       pointer-events: none;
     }
     .hero-grid {
       position: absolute; inset: 0; pointer-events: none;
-      background-image:
-        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
       background-size: 44px 44px;
-      -webkit-mask-image: linear-gradient(to bottom,#000 30%,transparent 95%);
       mask-image: linear-gradient(to bottom,#000 30%,transparent 95%);
+      -webkit-mask-image: linear-gradient(to bottom,#000 30%,transparent 95%);
     }
-    #particles-canvas {
-      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-    }
-    .hero-inner {
-      position: relative;
-      max-width: 1100px; margin: 0 auto;
-      padding: 28px 24px 36px;
-    }
+    #particles-canvas { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .hero-inner { position: relative; max-width: 1100px; margin: 0 auto; padding: 28px 24px 36px; }
 
-    /* hero top bar */
-    .hero-topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
-    }
+    .hero-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     .hero-org {
-      font-family: var(--mono); font-size: 11px;
-      letter-spacing: .22em; text-transform: uppercase; color: var(--dim);
+      font-family: var(--mono); font-size: 11px; letter-spacing: .22em;
+      text-transform: uppercase; color: var(--dim);
       display: inline-flex; align-items: center; gap: 8px;
     }
-    .eq-wrap {
-      display: inline-flex; align-items: flex-end; gap: 2px;
-      height: 10px;
-    }
-    .eq-wrap span {
-      display: block; width: 2px; border-radius: 2px;
-      background: var(--signal); box-shadow: 0 0 4px var(--signal);
-    }
+    .eq-wrap { display: inline-flex; align-items: flex-end; gap: 2px; height: 10px; }
+    .eq-wrap span { display: block; width: 2px; border-radius: 2px; background: var(--signal); box-shadow: 0 0 4px var(--signal); }
     .hero-topright { display: flex; align-items: center; gap: 14px; }
     #clock { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--dim); }
     .live-badge {
@@ -215,388 +141,246 @@
       border: 1px solid rgba(255,86,56,.35); border-radius: 999px;
       padding: 4px 10px; background: rgba(255,86,56,.05);
     }
-    .live-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--signal); box-shadow: 0 0 8px var(--signal);
-    }
-    .live-label {
-      font-family: var(--mono); font-size: 10px;
-      letter-spacing: .2em; text-transform: uppercase; color: #cbd5e1;
-    }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 8px var(--signal); }
+    .live-label { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: #cbd5e1; }
 
-    /* hero title row */
-    .hero-title-row {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      gap: 20px; flex-wrap: wrap; margin-bottom: 28px;
-    }
-    #board-title {
-      font-size: clamp(24px, 4vw, 40px); font-weight: 600;
-      color: #fff; letter-spacing: -.02em; line-height: 1.05;
-      margin-bottom: 8px;
-    }
-    #board-sub { font-size: 13px; color: var(--dim); line-height: 1.65; max-width: 520px; }
-
-    /* jarvis link button */
-    #jarvis-fab-link {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 10px 16px; border-radius: 10px;
-      border: 1px solid rgba(99,102,241,.35);
-      background: linear-gradient(135deg, rgba(26,29,46,.9), rgba(37,40,69,.9));
-      text-decoration: none; white-space: nowrap; flex-shrink: 0;
-      box-shadow: 0 8px 24px -8px rgba(99,102,241,.3);
-      transition: border-color .2s, box-shadow .2s, transform .2s;
-    }
-    #jarvis-fab-link:hover {
-      border-color: rgba(99,102,241,.6);
-      box-shadow: 0 12px 32px -8px rgba(99,102,241,.5);
-      transform: translateY(-1px);
-    }
-    .jarvis-orb-wrap {
-      position: relative; width: 36px; height: 36px; flex-shrink: 0;
-    }
-    .jarvis-orb-ping {
-      position: absolute; inset: 0; border-radius: 50%; opacity: .6;
-      background: radial-gradient(circle, var(--blue) 0%, transparent 70%);
-      animation: orbPing 2.4s ease-out infinite;
-    }
-    .jarvis-orb {
-      position: absolute; inset: 6px; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #c7d2fe, #6366f1 45%, #4338ca 80%);
-      box-shadow: rgba(99,102,241,.7) 0 0 12px, rgba(255,255,255,.6) 0 0 6px inset;
-    }
-    .jarvis-orb-glint {
-      position: absolute; border-radius: 50%; background: rgba(255,255,255,.8);
-      width: 7px; height: 7px; top: 8px; left: 10px; filter: blur(.5px);
-    }
-    .jarvis-fab-text { line-height: 1.25; }
-    .jarvis-fab-title { display: block; font-size: 13px; font-weight: 500; color: #e2e8f0; }
-    .jarvis-fab-sub   { display: block; font-size: 11px; color: rgba(99,102,241,.7); margin-top: 1px; font-family: var(--mono); }
+    .hero-title-row { margin-bottom: 28px; }
+    #board-title { font-size: clamp(24px,4vw,40px); font-weight: 600; color: #fff; letter-spacing: -.02em; line-height: 1.05; margin-bottom: 8px; }
+    #board-sub   { font-size: 13px; color: var(--dim); line-height: 1.65; max-width: 520px; }
 
     /* conveyor */
     .conveyor-wrap { position: relative; }
-    .conveyor-track {
-      position: absolute; left: 0; right: 0; top: 22px;
-      height: 2px; background: rgba(255,255,255,.18);
-      border-radius: 2px; overflow: hidden;
-    }
+    .conveyor-track { position: absolute; left: 0; right: 0; top: 22px; height: 2px; background: rgba(255,255,255,.18); border-radius: 2px; overflow: hidden; }
     .conveyor-sweep {
       position: absolute; top: 0; height: 2px; width: 180px;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,86,56,.4) 30%, var(--signal) 50%, rgba(255,86,56,.4) 70%, transparent 100%);
+      background: linear-gradient(90deg,transparent 0%,rgba(255,86,56,.4) 30%,var(--signal) 50%,rgba(255,86,56,.4) 70%,transparent 100%);
       box-shadow: 0 0 10px var(--signal); filter: blur(.3px);
     }
-    .conveyor-stages {
-      position: relative;
-      display: grid; grid-template-columns: repeat(4,1fr);
-    }
+    .conveyor-stages { position: relative; display: grid; grid-template-columns: repeat(4,1fr); }
     @media(max-width:560px){ .conveyor-stages{ grid-template-columns:repeat(2,1fr); row-gap:24px; } }
 
-    .stage-item {
-      display: flex; flex-direction: column;
-      align-items: center; text-align: center;
-    }
-    .stage-ring-wrap {
-      position: relative; width: 44px; height: 44px;
-    }
-    .stage-ring {
-      position: absolute; inset: 0; border-radius: 50%;
-      display: grid; place-items: center;
-      border: 1px solid;
-      background: var(--bg);
-    }
-    .stage-spin {
-      position: absolute; inset: -3px; border-radius: 50%;
-      pointer-events: none;
-    }
-    .stage-ripple {
-      position: absolute; inset: 0; border-radius: 50%;
-      border: 1px solid;
-      pointer-events: none;
-    }
+    .stage-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .stage-ring-wrap { position: relative; width: 44px; height: 44px; }
+    .stage-ring { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; border: 1px solid; background: var(--bg); }
+    .stage-spin { position: absolute; inset: -3px; border-radius: 50%; pointer-events: none; }
+    .stage-ripple { position: absolute; inset: 0; border-radius: 50%; border: 1px solid; pointer-events: none; }
     .stage-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .stage-count {
-      font-family: var(--mono); font-size: 22px; font-weight: 600;
-      color: #fff; margin-top: 10px; font-variant-numeric: tabular-nums;
-    }
-    .stage-label {
-      font-family: var(--mono); font-size: 10px;
-      text-transform: uppercase; letter-spacing: .18em; color: var(--dim);
-      margin-top: 3px;
-    }
+    .stage-count { font-family: var(--mono); font-size: 22px; font-weight: 600; color: #fff; margin-top: 10px; font-variant-numeric: tabular-nums; }
+    .stage-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .18em; color: var(--dim); margin-top: 3px; }
 
-    /* readouts */
-    .readouts {
-      display: flex; flex-wrap: wrap; gap: 8px 24px;
-      margin-top: 28px; padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
+    .readouts { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border); }
     .readout { display: flex; align-items: baseline; gap: 8px; }
     .readout-key { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .18em; color: var(--dim); }
     .readout-val { font-family: var(--mono); font-size: 13px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; }
 
-    /* ─── status ribbon ──────────────────── */
+    /* ── ribbon ── */
     #status-ribbon {
       position: relative; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,.3); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+      background: rgba(0,0,0,.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       overflow: hidden;
     }
-    .ribbon-fade-l {
-      pointer-events: none; position: absolute; inset-block: 0; left: 0; width: 80px;
-      background: linear-gradient(to right, var(--bg), transparent); z-index: 10;
-    }
-    .ribbon-fade-r {
-      pointer-events: none; position: absolute; inset-block: 0; right: 0; width: 80px;
-      background: linear-gradient(to left, var(--bg), transparent); z-index: 10;
-    }
-    .ribbon-track {
-      display: flex; align-items: center; gap: 32px;
-      padding: 10px 0; white-space: nowrap; will-change: transform;
-    }
-    .ribbon-item {
-      display: inline-flex; align-items: center; gap: 10px;
-    }
-    .ribbon-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .ribbon-num { font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
-    .ribbon-title { font-size: 12px; font-weight: 500; color: #cbd5e1; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
-    .ribbon-status { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .18em; }
-    .ribbon-sep { color: #334155; }
+    .ribbon-fade-l { pointer-events:none; position:absolute; inset-block:0; left:0; width:80px; background:linear-gradient(to right,var(--bg),transparent); z-index:10; }
+    .ribbon-fade-r { pointer-events:none; position:absolute; inset-block:0; right:0; width:80px; background:linear-gradient(to left,var(--bg),transparent); z-index:10; }
+    .ribbon-track { display:flex; align-items:center; gap:32px; padding:10px 0; white-space:nowrap; will-change:transform; }
+    .ribbon-item  { display:inline-flex; align-items:center; gap:10px; }
+    .ribbon-dot   { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .ribbon-num   { font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); }
+    .ribbon-title { font-size:12px; font-weight:500; color:#cbd5e1; max-width:260px; overflow:hidden; text-overflow:ellipsis; }
+    .ribbon-status{ font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.18em; }
+    .ribbon-sep   { color:#334155; }
 
-    /* ─── main ───────────────────────────── */
-    main {
-      max-width: 1100px; margin: 0 auto;
-      padding: 20px 24px 64px;
-      display: flex; flex-direction: column; gap: 16px;
-    }
+    /* ── main layout ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 20px 24px 64px; display: flex; flex-direction: column; gap: 16px; }
 
-    /* ─── JARVIS briefing card ───────────── */
+    /* ── Jarvis briefing ── */
     #jarvis-briefing {
-      position: relative; overflow: hidden;
-      border-radius: 16px;
+      position: relative; overflow: hidden; border-radius: 16px;
       border: 1px solid rgba(99,102,241,.2);
-      background: linear-gradient(135deg, #1a1d2e, #161827, #0f1119);
+      background: linear-gradient(135deg,#1a1d2e,#161827,#0f1119);
       padding: 20px 24px;
     }
-    .jb-glow-1 {
-      pointer-events: none; position: absolute;
-      top: -96px; right: -96px; width: 288px; height: 288px;
-      border-radius: 50%; opacity: .4;
-      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
-    }
-    .jb-glow-2 {
-      pointer-events: none; position: absolute;
-      bottom: -128px; left: -64px; width: 256px; height: 256px;
-      border-radius: 50%; opacity: .3;
-      background: radial-gradient(circle, #ec4899 0%, transparent 70%);
-    }
-    .jb-inner { position: relative; display: flex; gap: 16px; align-items: flex-start; }
-    .jb-avatar-col { flex-shrink: 0; }
-    .jb-name { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: rgba(165,180,252,.8); }
-    .jb-status { font-size: 11px; color: var(--dim); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
-    .jb-online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: hubPulse 2s ease-in-out infinite; }
-    .jb-message { font-size: 15px; line-height: 1.65; color: var(--text); min-height: 3em; }
-    .jb-actions { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .jb-glow-1 { pointer-events:none; position:absolute; top:-96px; right:-96px; width:288px; height:288px; border-radius:50%; opacity:.4; background:radial-gradient(circle,#6366f1 0%,transparent 70%); }
+    .jb-glow-2 { pointer-events:none; position:absolute; bottom:-128px; left:-64px; width:256px; height:256px; border-radius:50%; opacity:.3; background:radial-gradient(circle,#ec4899 0%,transparent 70%); }
+    .jb-inner  { position:relative; display:flex; gap:16px; align-items:flex-start; }
+    .jb-name   { font-family:var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:rgba(165,180,252,.8); }
+    .jb-status { font-size:11px; color:var(--dim); margin-top:4px; display:flex; align-items:center; gap:6px; }
+    .jb-online-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:hubPulse 2s ease-in-out infinite; }
+    .jb-message{ font-size:15px; line-height:1.65; color:var(--text); min-height:3em; }
+    .jb-actions{ margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; }
     .jb-btn-primary {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff;
-      background: linear-gradient(to right, #6366f1, #a855f7);
-      border: none; cursor: pointer; text-decoration: none;
-      box-shadow: 0 4px 12px rgba(99,102,241,.25);
-      transition: filter .15s;
+      display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:8px;
+      font-size:13px; font-weight:500; color:#fff;
+      background:linear-gradient(to right,#6366f1,#a855f7);
+      border:none; cursor:pointer; text-decoration:none;
+      box-shadow:0 4px 12px rgba(99,102,241,.25); transition:filter .15s;
     }
-    .jb-btn-primary:hover { filter: brightness(1.1); }
+    .jb-btn-primary:hover { filter:brightness(1.1); }
     .jb-btn-secondary {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
-      color: #e2e8f0; background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.15); cursor: pointer; text-decoration: none;
-      transition: background .15s;
+      display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:8px;
+      font-size:13px; font-weight:500; color:#e2e8f0;
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15);
+      cursor:pointer; text-decoration:none; transition:background .15s;
     }
-    .jb-btn-secondary:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .jb-btn-secondary:hover { background:rgba(255,255,255,.1); color:#fff; }
 
-    /* ─── charts row ─────────────────────── */
-    #charts-row { display: none; grid-template-columns: 3fr 2fr; gap: 16px; }
+    /* orb */
+    .jarvis-orb-wrap { position:relative; display:block; flex-shrink:0; }
+    .jarvis-orb-ping { position:absolute; inset:0; border-radius:50%; opacity:.6; background:radial-gradient(circle,var(--blue) 0%,transparent 70%); animation:orbPing 2.4s ease-out infinite; }
+    .jarvis-orb      { position:absolute; border-radius:50%; background:radial-gradient(circle at 30% 30%,#c7d2fe,#6366f1 45%,#4338ca 80%); box-shadow:rgba(99,102,241,.7) 0 0 12px,rgba(255,255,255,.6) 0 0 6px inset; }
+    .jarvis-orb-glint{ position:absolute; border-radius:50%; background:rgba(255,255,255,.8); filter:blur(.5px); }
+
+    /* ── charts ── */
+    #charts-row { display:none; grid-template-columns:3fr 2fr; gap:16px; }
     @media(max-width:700px){ #charts-row{ grid-template-columns:1fr; } }
 
-    .hud-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 18px 20px;
-    }
-    .hud-card-header {
-      display: flex; align-items: baseline; justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .hud-card-title { font-size: 13px; font-weight: 600; color: var(--text); }
-    .hud-card-sub { font-family: var(--mono); font-size: 11px; color: var(--dim); }
-    #team-chart-wrap { height: 200px; position: relative; }
+    .hud-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px; }
+    .hud-card-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
+    .hud-card-title  { font-size:13px; font-weight:600; color:var(--text); }
+    .hud-card-sub    { font-family:var(--mono); font-size:11px; color:var(--dim); }
+    #team-chart-wrap { height:200px; position:relative; }
 
-    /* status mix */
-    .mix-item { margin-bottom: 12px; }
-    .mix-item:last-child { margin-bottom: 0; }
-    .mix-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
-    .mix-name { font-weight: 500; color: var(--muted); }
-    .mix-nums { font-family: var(--mono); color: var(--dim); }
-    .mix-track { height: 5px; background: rgba(255,255,255,.05); border-radius: 99px; overflow: hidden; }
-    .mix-fill  { height: 100%; border-radius: 99px; transition: width .5s ease; }
+    .mix-item { margin-bottom:12px; }
+    .mix-item:last-child { margin-bottom:0; }
+    .mix-row  { display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; }
+    .mix-name { font-weight:500; color:var(--muted); }
+    .mix-nums { font-family:var(--mono); color:var(--dim); }
+    .mix-track{ height:5px; background:rgba(255,255,255,.05); border-radius:99px; overflow:hidden; }
+    .mix-fill { height:100%; border-radius:99px; transition:width .5s ease; }
 
-    /* ─── requests card ──────────────────── */
-    #requests-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden;
-    }
+    /* ── requests card ── */
+    #requests-card { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
     .req-header {
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 10px;
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+      padding:14px 18px; border-bottom:1px solid var(--border);
     }
-    .req-header-left { display: flex; align-items: center; gap: 8px; }
-    .req-title-text { font-size: 13px; font-weight: 600; color: var(--text); }
+    .req-header-left { display:flex; align-items:center; gap:8px; }
+    .req-title-text  { font-size:13px; font-weight:600; color:var(--text); }
+
     #refresh-btn {
-      width: 28px; height: 28px; border-radius: 6px;
-      border: 1px solid var(--border2); background: transparent; cursor: pointer;
-      display: grid; place-items: center; color: var(--dim);
-      transition: background .15s, color .15s;
+      width:28px; height:28px; border-radius:6px; border:1px solid var(--border2);
+      background:transparent; cursor:pointer; display:grid; place-items:center; color:var(--dim);
+      transition:background .15s, color .15s;
     }
-    #refresh-btn:hover { background: rgba(255,255,255,.05); color: var(--muted); }
-    #refresh-btn svg { width: 13px; height: 13px; }
+    #refresh-btn:hover { background:rgba(255,255,255,.05); color:var(--muted); }
+    #refresh-btn svg   { width:13px; height:13px; }
 
-    /* jarvis table button */
     .req-jarvis-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 500; color: #fff;
-      background: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
-      border: none; cursor: pointer; text-decoration: none;
-      box-shadow: 0 4px 12px rgba(139,92,246,.25);
-      transition: filter .15s;
+      display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:8px;
+      font-size:11px; font-weight:500; color:#fff;
+      background:linear-gradient(to right,#6366f1,#a855f7,#ec4899);
+      border:none; cursor:pointer; text-decoration:none;
+      box-shadow:0 4px 12px rgba(139,92,246,.25); transition:filter .15s;
     }
-    .req-jarvis-btn:hover { filter: brightness(1.1); }
+    .req-jarvis-btn:hover { filter:brightness(1.1); }
 
-    /* search */
-    .search-wrap { position: relative; }
-    .search-wrap svg {
-      position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
-      width: 13px; height: 13px; color: var(--dim); pointer-events: none;
-    }
+    .search-wrap { position:relative; }
+    .search-wrap svg { position:absolute; left:8px; top:50%; transform:translateY(-50%); width:13px; height:13px; color:var(--dim); pointer-events:none; }
     #search {
-      width: 160px; padding: 7px 10px 7px 28px; font-size: 12px;
-      font-family: var(--sans); border: 1px solid var(--border2); border-radius: 8px;
-      background: var(--bg); color: var(--text); outline: none;
-      transition: border-color .15s;
+      width:160px; padding:7px 10px 7px 28px; font-size:12px; font-family:var(--sans);
+      border:1px solid var(--border2); border-radius:8px;
+      background:var(--bg); color:var(--text); outline:none; transition:border-color .15s;
     }
-    #search:focus { border-color: rgba(255,255,255,.3); }
-    #search::placeholder { color: var(--dim); }
+    #search:focus { border-color:rgba(255,255,255,.3); }
+    #search::placeholder { color:var(--dim); }
 
-    /* pills */
-    #filter-pills { display: none; flex-wrap: wrap; gap: 6px; padding: 10px 18px; border-bottom: 1px solid var(--border); }
+    /* pills — ALWAYS visible once data loads */
+    #filter-pills { display:none; flex-wrap:wrap; align-items:center; gap:6px; padding:10px 18px; border-bottom:1px solid var(--border); }
+    .pill-lbl { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:var(--dim); width:64px; flex-shrink:0; }
     .pill-btn {
-      border-radius: 999px; padding: 4px 12px;
-      font-size: 12px; font-weight: 500;
-      border: 1px solid var(--border2); background: transparent; color: #cbd5e1;
-      cursor: pointer; transition: all .12s;
+      border-radius:999px; padding:4px 12px; font-size:12px; font-weight:500;
+      border:1px solid var(--border2); background:transparent; color:#cbd5e1;
+      cursor:pointer; transition:all .12s;
     }
-    .pill-btn:hover { border-color: rgba(255,255,255,.4); color: #fff; }
-    .pill-btn.active { background: #fff; color: #0b0d12; border-color: #fff; }
-    .pill-count { font-family: var(--mono); margin-left: 5px; opacity: .6; font-size: 11px; }
+    .pill-btn:hover { border-color:rgba(255,255,255,.4); color:#fff; }
+    .pill-btn.active { background:#fff !important; color:#0b0d12 !important; border-color:#fff !important; }
+    .pill-count { font-family:var(--mono); margin-left:5px; opacity:.6; font-size:11px; }
 
     /* table */
-    #table-area { overflow-x: auto; }
-    table { width: 100%; min-width: 580px; border-collapse: collapse; text-align: left; }
-    thead tr { border-bottom: 1px solid var(--border); }
-    th {
-      font-family: var(--mono); font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: .12em; color: var(--dim);
-      padding: 10px 16px;
-    }
-    tbody tr { border-bottom: 1px solid rgba(255,255,255,.05); transition: background .1s; cursor: pointer; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,.03); }
-    td { padding: 10px 16px; }
+    #table-area { overflow-x:auto; }
+    table { width:100%; min-width:580px; border-collapse:collapse; text-align:left; }
+    thead tr { border-bottom:1px solid var(--border); }
+    th { font-family:var(--mono); font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:.12em; color:var(--dim); padding:10px 16px; }
+    tbody tr { border-bottom:1px solid rgba(255,255,255,.05); transition:background .1s; cursor:pointer; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:rgba(255,255,255,.03); }
+    td { padding:10px 16px; vertical-align:middle; }
 
-    .req-cell { display: flex; align-items: center; gap: 10px; }
-    .avatar {
-      width: 32px; height: 32px; flex-shrink: 0; border-radius: 8px;
-      display: grid; place-items: center;
-      font-size: 10px; font-weight: 700;
-    }
-    .req-name-text  { font-size: 13px; font-weight: 500; color: var(--text); }
-    .req-person { font-size: 12px; color: #cbd5e1; }
-    .req-team-text { font-size: 12px; color: var(--dim); }
-    .req-lead-text  { font-size: 12px; color: var(--muted); }
-    .req-date-text  { font-family: var(--mono); font-size: 11px; color: var(--dim); }
+    .req-cell { display:flex; align-items:center; gap:10px; }
+    .avatar { width:32px; height:32px; flex-shrink:0; border-radius:8px; display:grid; place-items:center; font-size:10px; font-weight:700; }
+    .req-name-text { font-size:13px; font-weight:500; color:var(--text); }
+    .req-person    { font-size:12px; color:#cbd5e1; }
+    .req-team-text { font-size:12px; color:var(--dim); }
+    .req-lead-text { font-size:12px; color:var(--muted); }
+    .req-date-text { font-family:var(--mono); font-size:11px; color:var(--dim); white-space:nowrap; }
 
     .status-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      border-radius: 999px; border: 1px solid;
-      padding: 2px 10px; font-size: 11px; font-weight: 500; white-space: nowrap;
+      display:inline-flex; align-items:center; gap:5px;
+      border-radius:999px; border:1px solid; padding:2px 10px;
+      font-size:11px; font-weight:500; white-space:nowrap;
     }
-    .status-pip { width: 5px; height: 5px; border-radius: 50%; }
+    .status-pip { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
 
-    /* footer */
-    #footer-bar {
-      display: none; align-items: center; justify-content: space-between;
-      padding: 10px 18px; border-top: 1px solid var(--border);
-    }
-    #footer-count { font-family: var(--mono); font-size: 11px; color: var(--dim); }
-    .footer-src { font-size: 11px; color: var(--dim); display: inline-flex; align-items: center; gap: 4px; }
-    .footer-src svg { width: 11px; height: 11px; }
+    #footer-bar { display:none; align-items:center; justify-content:space-between; padding:10px 18px; border-top:1px solid var(--border); }
+    #footer-count { font-family:var(--mono); font-size:11px; color:var(--dim); }
+    .footer-src   { font-size:11px; color:var(--dim); display:inline-flex; align-items:center; gap:4px; }
+    .footer-src svg { width:11px; height:11px; }
 
     /* skeleton */
-    .skeleton-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,.04); }
-    .skel { background: rgba(255,255,255,.06); border-radius: 6px; animation: skelpulse 1.6s ease-in-out infinite; }
-    .skel-avatar { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
-    .skel-lines  { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-    .skel-line-a { height: 11px; width: 38%; }
-    .skel-line-b { height: 9px;  width: 55%; }
-    .skel-pill   { width: 72px; height: 20px; border-radius: 99px; }
+    .skeleton-row { display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,.04); }
+    .skel { background:rgba(255,255,255,.06); border-radius:6px; animation:skelpulse 1.6s ease-in-out infinite; }
+    .skel-avatar { width:32px; height:32px; border-radius:8px; flex-shrink:0; }
+    .skel-lines  { flex:1; display:flex; flex-direction:column; gap:6px; }
+    .skel-line-a { height:11px; width:38%; }
+    .skel-line-b { height:9px; width:55%; }
+    .skel-pill   { width:72px; height:20px; border-radius:99px; }
 
     /* empty / error */
-    #empty-state { padding: 56px 24px; text-align: center; }
-    .empty-icon { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; margin: 0 auto 14px; }
-    .empty-icon svg { width: 22px; height: 22px; }
-    .empty-heading { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-    .empty-body { font-size: 12px; color: var(--dim); max-width: 380px; margin: 0 auto 18px; line-height: 1.65; }
-    .empty-body code { font-family: var(--mono); font-size: 11px; background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 4px; }
+    #empty-state  { padding:56px 24px; text-align:center; }
+    .empty-icon   { width:44px; height:44px; border-radius:10px; display:grid; place-items:center; margin:0 auto 14px; }
+    .empty-icon svg { width:22px; height:22px; }
+    .empty-heading{ font-size:14px; font-weight:600; color:var(--text); margin-bottom:6px; }
+    .empty-body   { font-size:12px; color:var(--dim); max-width:380px; margin:0 auto 18px; line-height:1.65; }
+    .empty-body code { font-family:var(--mono); font-size:11px; background:rgba(255,255,255,.06); padding:1px 5px; border-radius:4px; }
     .retry-btn {
-      display: inline-flex; align-items: center; gap: 6px; padding: 7px 18px;
-      border-radius: 8px; background: rgba(255,255,255,.08); color: var(--text);
-      border: 1px solid var(--border2); font-size: 13px; font-weight: 500; cursor: pointer;
-      transition: background .15s;
+      display:inline-flex; align-items:center; gap:6px; padding:7px 18px; border-radius:8px;
+      background:rgba(255,255,255,.08); color:var(--text);
+      border:1px solid var(--border2); font-size:13px; font-weight:500; cursor:pointer; transition:background .15s;
     }
-    .retry-btn:hover { background: rgba(255,255,255,.12); }
-    .retry-btn svg { width: 14px; height: 14px; }
-    .no-match { padding: 48px 24px; text-align: center; font-size: 13px; color: var(--dim); }
+    .retry-btn:hover { background:rgba(255,255,255,.12); }
+    .retry-btn svg { width:14px; height:14px; }
+    .no-match { padding:48px 24px; text-align:center; font-size:13px; color:var(--dim); }
 
-    /* ─── floating FAB ───────────────────── */
-    #jarvis-float {
-      position: fixed; bottom: 20px; right: 20px; z-index: 40;
-    }
+    /* ── floating FAB ── */
+    #jarvis-float { position:fixed; bottom:20px; right:20px; z-index:40; }
     #jarvis-float a {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 16px 8px 8px; border-radius: 999px;
-      background: linear-gradient(to right, #1a1d2e, #252845);
-      border: 1px solid rgba(99,102,241,.3);
-      box-shadow: 0 20px 32px -8px rgba(0,0,0,.6), 0 0 0 1px rgba(99,102,241,.1);
-      text-decoration: none;
-      transition: border-color .2s, box-shadow .2s, transform .2s;
+      display:flex; align-items:center; gap:10px; padding:8px 16px 8px 8px; border-radius:999px;
+      background:linear-gradient(to right,#1a1d2e,#252845); border:1px solid rgba(99,102,241,.3);
+      box-shadow:0 20px 32px -8px rgba(0,0,0,.6);
+      text-decoration:none; transition:border-color .2s, box-shadow .2s, transform .2s;
     }
-    #jarvis-float a:hover {
-      border-color: rgba(99,102,241,.6);
-      box-shadow: 0 20px 40px -8px rgba(99,102,241,.4);
-      transform: translateY(-2px);
+    #jarvis-float a:hover { border-color:rgba(99,102,241,.6); box-shadow:0 20px 40px -8px rgba(99,102,241,.4); transform:translateY(-2px); }
+    .fab-orb-wrap { position:relative; width:28px; height:28px; flex-shrink:0; }
+    .fab-orb-ping { position:absolute; inset:0; border-radius:50%; opacity:.6; background:radial-gradient(circle,var(--blue) 0%,transparent 70%); animation:orbPing 2.4s ease-out infinite; }
+    .fab-orb      { position:absolute; inset:4px; border-radius:50%; background:radial-gradient(circle at 30% 30%,#c7d2fe,#6366f1 45%,#4338ca 80%); box-shadow:rgba(99,102,241,.7) 0 0 12px; }
+    .fab-text     { line-height:1.2; }
+    .fab-text-top { display:block; font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:rgba(165,180,252,.8); }
+    .fab-text-bot { display:block; font-size:12px; font-weight:500; color:var(--text); }
+
+    /* ── debug panel (hidden by default) ── */
+    #debug-panel {
+      display:none; position:fixed; bottom:80px; right:20px; z-index:50;
+      background:#0f1119; border:1px solid rgba(99,102,241,.4); border-radius:10px;
+      padding:12px 16px; max-width:420px; max-height:320px; overflow:auto;
+      font-family:var(--mono); font-size:11px; color:#94a3b8;
     }
-    .fab-orb-wrap { position: relative; width: 28px; height: 28px; flex-shrink: 0; }
-    .fab-orb-ping {
-      position: absolute; inset: 0; border-radius: 50%; opacity: .6;
-      background: radial-gradient(circle, var(--blue) 0%, transparent 70%);
-      animation: orbPing 2.4s ease-out infinite;
+    #debug-panel pre { white-space:pre-wrap; word-break:break-all; }
+    #debug-toggle {
+      position:fixed; bottom:80px; right:20px; z-index:49;
+      font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+      background:rgba(99,102,241,.15); border:1px solid rgba(99,102,241,.3);
+      color:rgba(165,180,252,.7); border-radius:6px; padding:4px 10px;
+      cursor:pointer; display:none;
     }
-    .fab-orb {
-      position: absolute; inset: 4px; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #c7d2fe, #6366f1 45%, #4338ca 80%);
-      box-shadow: rgba(99,102,241,.7) 0 0 12px;
-    }
-    .fab-text { line-height: 1.2; }
-    .fab-text-top { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: rgba(165,180,252,.8); }
-    .fab-text-bot { display: block; font-size: 12px; font-weight: 500; color: var(--text); }
   </style>
 </head>
 <body>
@@ -611,26 +395,24 @@
   </div>
 </nav>
 
-<!-- HEADER -->
+<!-- HERO HEADER -->
 <header id="board-header" class="fade-in-up">
   <div class="top-bar-line"></div>
   <div class="hero-aurora"></div>
   <div class="hero-grid"></div>
-
-  <!-- particles -->
   <div id="particles-canvas" aria-hidden="true"></div>
 
   <div class="hero-inner">
     <div class="hero-topbar">
       <span class="hero-org">
         <span class="eq-wrap" aria-hidden="true">
-          <span style="height:100%;animation-delay:0s;animation-duration:.8s"   class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.15s;animation-duration:1s" class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.3s;animation-duration:1.2s"class="eq-bar"></span>
+          <span style="height:100%;animation-delay:0s;animation-duration:.8s"    class="eq-bar"></span>
+          <span style="height:100%;animation-delay:-.15s;animation-duration:1s"  class="eq-bar"></span>
+          <span style="height:100%;animation-delay:-.3s;animation-duration:1.2s" class="eq-bar"></span>
           <span style="height:100%;animation-delay:-.45s;animation-duration:.8s" class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.6s;animation-duration:1s"  class="eq-bar"></span>
+          <span style="height:100%;animation-delay:-.6s;animation-duration:1s"   class="eq-bar"></span>
           <span style="height:100%;animation-delay:-.75s;animation-duration:1.2s"class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.9s;animation-duration:.8s" class="eq-bar"></span>
+          <span style="height:100%;animation-delay:-.9s;animation-duration:.8s"  class="eq-bar"></span>
         </span>
         RCCB · IT&nbsp;Automation
       </span>
@@ -644,25 +426,10 @@
     </div>
 
     <div class="hero-title-row">
-      <div>
-        <h1 id="board-title">Intake <span class="shimmer-text">Control Board</span></h1>
-        <p id="board-sub">Every automation request the team takes in — from first submission to shipped — moving across one board.</p>
-      </div>
-      <!-- Replace href with your Copilot Studio agent URL -->
-      <a id="jarvis-fab-link" href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener">
-        <span class="jarvis-orb-wrap">
-          <span class="jarvis-orb-ping"></span>
-          <span class="jarvis-orb"></span>
-          <span class="jarvis-orb-glint"></span>
-        </span>
-        <span class="jarvis-fab-text">
-          <span class="jarvis-fab-title">Ask J.A.R.V.I.S.</span>
-          <span class="jarvis-fab-sub">Open AI agent ↗</span>
-        </span>
-      </a>
+      <h1 id="board-title">Intake <span class="shimmer-text">Control Board</span></h1>
+      <p id="board-sub">Every automation request the team takes in — from first submission to shipped — moving across one board.</p>
     </div>
 
-    <!-- Conveyor -->
     <div class="conveyor-wrap">
       <div class="conveyor-track">
         <div class="conveyor-sweep hub-sweep"></div>
@@ -681,15 +448,17 @@
   <div class="ribbon-track marquee" id="ribbon-track"></div>
 </div>
 
-<!-- JARVIS BRIEFING -->
+<!-- MAIN -->
 <main>
+
+  <!-- Jarvis briefing -->
   <div id="jarvis-briefing" class="lift">
     <div class="jb-glow-1"></div>
     <div class="jb-glow-2"></div>
     <div class="jb-inner">
-      <div class="jb-avatar-col">
-        <span class="jarvis-orb-wrap" style="width:44px;height:44px;display:block;">
-          <span class="jarvis-orb-ping" style="animation-duration:2.4s;"></span>
+      <div style="flex-shrink:0;">
+        <span class="jarvis-orb-wrap" style="width:44px;height:44px;">
+          <span class="jarvis-orb-ping"></span>
           <span class="jarvis-orb" style="inset:6.6px;"></span>
           <span class="jarvis-orb-glint" style="width:8px;height:8px;top:10px;left:12px;"></span>
         </span>
@@ -698,7 +467,7 @@
       </div>
       <div style="flex:1;min-width:0;">
         <div class="jb-message" id="jarvis-message">
-          Good morning. Automation intake board is live and connected to SharePoint. I'm monitoring <span id="jarvis-open-count">—</span> open requests. Want me to break it down?
+          Good morning. Automation intake board is live and connected to SharePoint. Monitoring <span id="jarvis-open-count">—</span> open requests. Want me to break it down?
         </div>
         <div class="jb-actions">
           <a href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener" class="jb-btn-primary">
@@ -714,7 +483,7 @@
     </div>
   </div>
 
-  <!-- Charts -->
+  <!-- Charts (shown after data loads) -->
   <div id="charts-row">
     <div class="hud-card lift">
       <div class="hud-card-header">
@@ -743,7 +512,7 @@
           </svg>
         </button>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <a href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener" class="req-jarvis-btn">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
           Chat with Jarvis to update your projects
@@ -757,8 +526,12 @@
       </div>
     </div>
 
+    <!-- Filter pills row -->
     <div id="filter-pills"></div>
+
+    <!-- Table / skeleton / empty -->
     <div id="table-area"></div>
+
     <div id="footer-bar">
       <span id="footer-count"></span>
       <span class="footer-src">
@@ -771,7 +544,7 @@
   </div>
 </main>
 
-<!-- FLOATING FAB -->
+<!-- Floating Jarvis FAB -->
 <div id="jarvis-float">
   <a href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener" aria-label="Ask Jarvis">
     <span class="fab-orb-wrap">
@@ -785,1561 +558,459 @@
   </a>
 </div>
 
+<!-- Debug panel (shows when ?debug=1 is in URL) -->
+<div id="debug-panel"><pre id="debug-pre"></pre></div>
+
 <script>
-  /* ================================================================
-     CONFIG — only these two things need editing
-     ================================================================ */
-  const FLOW_URL =
-    "https://a477fe69c32a4af79331a1752086c6.34.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a1a2a818907c499992855167195cb1e6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=L4dmM-57GdhVLTSDxZGwJ8FzJ5PwWfZq1ZKgfp54EVM";
+/* ===================================================================
+   ① ONLY EDIT THESE TWO THINGS
+   =================================================================== */
+const FLOW_URL =
+  "https://a477fe69c32a4af79331a1752086c6.34.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a1a2a818907c499992855167195cb1e6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=L4dmM-57GdhVLTSDxZGwJ8FzJ5PwWfZq1ZKgfp54EVM";
 
-  // Your working field mapping — unchanged
-  function mapItem(it) {
-    const requesterObj = Array.isArray(it.field_2) ? it.field_2[0] : null;
-    const leadObj      = Array.isArray(it.field_7) ? it.field_7[0] : null;
-    const statusObj    = Array.isArray(it.field_8) ? it.field_8[0] : null;
-    return {
-      id:        it.ID,
-      title:     it.field_1 || "Untitled request",
-      requester: requesterObj?.DisplayName || "—",
-      team:      it.Team_x002f_Department1?.Value || "—",
-      lead:      leadObj?.Value || "—",
-      status:    statusObj?.Value || "New",
-      submitted: it.Created,
-      reqNumber: it.Title,
-      typeReq:   it.TypeofRequest?.Value,
-      useCase:   it.TypeofUseCase?.Value,
-      desc:      it.field_6,
-    };
-  }
+const COPILOT_URL = "YOUR_COPILOT_AGENT_URL"; // replace with your actual link
 
-  /* ================================================================
-     CONSTANTS
-     ================================================================ */
-  const STAGES = ["New", "In Progress", "On Hold", "Completed"];
-  const HUE = {
-    "New":         "#60a5fa",
-    "In Progress": "#a78bfa",
-    "On Hold":     "#f59e0b",
-    "Completed":   "#34d399",
+/* ===================================================================
+   ② STATUS EXTRACTOR — bulletproof multi-format fallback
+      Tries every known shape SharePoint / Power Automate can return.
+   =================================================================== */
+function extractStatus(item) {
+  const candidates = [
+    // array with .Value
+    Array.isArray(item.field_8)   && item.field_8[0]?.Value,
+    Array.isArray(item.Status)    && item.Status[0]?.Value,
+    // plain string fields
+    item.field_8?.Value,
+    item.Status?.Value,
+    item.field_8,
+    item.Status,
+    item.status,
+    item["Status "],           // trailing-space typo sometimes seen in SP exports
+    item.RequestStatus,
+  ].filter(v => typeof v === "string" && v.trim());
+
+  const raw = candidates[0] || "New";
+
+  // normalise common variations
+  const map = {
+    "new":         "New",
+    "in progress": "In Progress",
+    "inprogress":  "In Progress",
+    "in-progress": "In Progress",
+    "on hold":     "On Hold",
+    "onhold":      "On Hold",
+    "hold":        "On Hold",
+    "completed":   "Completed",
+    "complete":    "Completed",
+    "done":        "Completed",
+    "shipped":     "Completed",
   };
+  return map[raw.toLowerCase().trim()] || raw;
+}
 
-  let allRecords   = [];
-  let activeFilter = "All";
-  let teamChart    = null;
+/* ===================================================================
+   ③ MAP ITEM — extracts every field with safe fallbacks
+   =================================================================== */
+function mapItem(it) {
+  const requesterObj = Array.isArray(it.field_2) ? it.field_2[0] : null;
+  const leadObj      = Array.isArray(it.field_7) ? it.field_7[0] : null;
 
-  /* ================================================================
-     UTILITIES
-     ================================================================ */
-  function pad2(n)     { return String(n).padStart(2,"0"); }
-  function initials(n) {
-    return (n||"?").split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase();
-  }
-  function fmtDate(v) {
-    if (!v) return "—";
-    const d = new Date(v);
-    return isNaN(d) ? String(v) : d.toLocaleDateString("en-US",{month:"short",day:"2-digit"});
-  }
-  function counts(records) {
-    const c = {New:0,"In Progress":0,"On Hold":0,Completed:0};
-    records.forEach(r=>{ if(c[r.status]!=null) c[r.status]++; });
-    return c;
-  }
+  // extract lead — handle both {DisplayName} and plain string or {Value}
+  const leadName =
+    leadObj?.DisplayName ||
+    leadObj?.Value       ||
+    (typeof it.field_7 === "string" ? it.field_7 : null) ||
+    it.ProjectLead || "—";
 
-  /* ================================================================
-     CLOCK
-     ================================================================ */
-  function tickClock() {
-    document.getElementById("clock").textContent =
-      new Date().toLocaleString("en-US",{
-        month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"
-      }).toUpperCase();
-  }
-  tickClock(); setInterval(tickClock,1000);
+  return {
+    id:        it.ID          || it.id          || "—",
+    title:     it.field_1     || it.Title_x0020_ || it.RequestTitle || "Untitled request",
+    requester: requesterObj?.DisplayName || it.Requester || "—",
+    team:      it["Team_x002f_Department1"]?.Value || it.Team || it.Department || "—",
+    lead:      leadName,
+    status:    extractStatus(it),
+    submitted: it.Created     || it.SubmittedDate || null,
+    reqNumber: it.Title       || it.RequestNumber || ("REQ-" + String(it.ID||"0").padStart(4,"0")),
+  };
+}
 
-  /* ================================================================
-     PARTICLES
-     ================================================================ */
-  (function spawnParticles() {
-    const canvas = document.getElementById("particles-canvas");
-    const COLORS = ["#a78bfa","#60a5fa","#ff5638"];
-    for (let i = 0; i < 22; i++) {
-      const s = document.createElement("span");
-      const sz = 2 + Math.random() * 3;
-      const c = COLORS[Math.floor(Math.random()*COLORS.length)];
-      Object.assign(s.style, {
-        position: "absolute",
-        left: Math.random()*100 + "%",
-        bottom: Math.random()*30 + "%",
-        width: sz+"px", height: sz+"px",
-        borderRadius: "50%",
-        background: c, boxShadow: c+" 0 0 6px",
-        opacity: ".5",
-        animationDelay: -(Math.random()*6)+"s",
-        animationDuration: (5+Math.random()*4)+"s",
-      });
-      s.className = "particle";
-      canvas.appendChild(s);
-    }
-  })();
+/* ===================================================================
+   CONSTANTS
+   =================================================================== */
+const STAGES = ["New", "In Progress", "On Hold", "Completed"];
+const HUE = {
+  "New":         "#60a5fa",
+  "In Progress": "#a78bfa",
+  "On Hold":     "#f59e0b",
+  "Completed":   "#34d399",
+};
 
-  /* ================================================================
-     HEADER — conveyor + readouts
-     ================================================================ */
-  function renderConveyor(c) {
-    document.getElementById("conveyor").innerHTML = STAGES.map(s => {
-      const h = HUE[s];
-      return `
-        <div class="stage-item">
-          <span class="stage-ring-wrap" style="cursor:default">
-            <span class="stage-ring" style="border-color:${h}66;">
-              <span class="stage-spin" style="background:conic-gradient(transparent 0%,${h}55 25%,transparent 50%,${h}55 75%,transparent 100%);
-                -webkit-mask:radial-gradient(circle,transparent 56%,black 58%);mask:radial-gradient(circle,transparent 56%,black 58%);"
-                class="spin-slow"></span>
-              <span class="stage-ripple ripple-ring" style="border-color:${h};"></span>
-              <span class="stage-dot" style="background:${h};box-shadow:${h} 0 0 10px;"></span>
-            </span>
-          </span>
-          <span class="stage-count">${pad2(c[s]||0)}</span>
-          <span class="stage-label">${s}</span>
-        </div>`;
-    }).join("");
-  }
+let allRecords   = [];
+let activeFilter = "All";
+let teamChart    = null;
+const DEBUG      = new URLSearchParams(location.search).has("debug");
 
-  function renderReadouts(records, c) {
-    const open = (c.New||0)+(c["In Progress"]||0)+(c["On Hold"]||0);
-    document.getElementById("readouts").innerHTML = [
-      ["Total intake", pad2(records.length), null],
-      ["Open",         pad2(open),           null],
-      ["Shipped",      pad2(c.Completed||0), HUE.Completed],
-      ["Signal nominal", "●", "#34d399"],
-    ].map(([k,v,accent]) => `
-      <div class="readout">
-        <span class="readout-key">${k}</span>
-        <span class="readout-val" style="${accent?`color:${accent}`:""}"> ${v}</span>
-      </div>`).join("");
-  }
+/* ===================================================================
+   DEBUG HELPERS
+   =================================================================== */
+function debugLog(label, data) {
+  if (!DEBUG) return;
+  const panel = document.getElementById("debug-panel");
+  const pre   = document.getElementById("debug-pre");
+  panel.style.display = "block";
+  pre.textContent += "\n\n── " + label + " ──\n" + JSON.stringify(data, null, 2);
+}
 
-  /* ================================================================
-     RIBBON — built from live data
-     ================================================================ */
-  function renderRibbon(records) {
-    if (!records.length) return;
-    const doubled = [...records, ...records]; // seamless loop
-    document.getElementById("ribbon-track").innerHTML = doubled.map(r => {
-      const h = HUE[r.status]||"#94a3b8";
-      return `
-        <span class="ribbon-item">
-          <span class="ribbon-dot" style="background:${h};box-shadow:${h} 0 0 6px;"></span>
-          <span class="ribbon-num">${r.reqNumber||r.id}</span>
-          <span class="ribbon-title">${r.title}</span>
-          <span class="ribbon-status" style="color:${h};">${r.status}</span>
-          <span class="ribbon-sep">•</span>
-        </span>`;
-    }).join("");
-  }
+/* ===================================================================
+   UTILITIES
+   =================================================================== */
+function pad2(n)     { return String(n).padStart(2,"0"); }
+function initials(n) { return (n||"?").split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase(); }
+function fmtDate(v) {
+  if (!v) return "—";
+  const d = new Date(v);
+  return isNaN(d) ? String(v) : d.toLocaleDateString("en-US",{month:"short",day:"2-digit"});
+}
+function counts(records) {
+  const c = {New:0,"In Progress":0,"On Hold":0,Completed:0};
+  records.forEach(r => { if (c[r.status] != null) c[r.status]++; else c[r.status] = 1; });
+  return c;
+}
 
-  /* ================================================================
-     CHARTS
-     ================================================================ */
-  function renderCharts(records, c) {
-    document.getElementById("charts-row").style.display = "grid";
-    document.getElementById("chart-total").textContent  = `${records.length} total`;
+/* ===================================================================
+   CLOCK
+   =================================================================== */
+function tickClock() {
+  document.getElementById("clock").textContent =
+    new Date().toLocaleString("en-US",{month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).toUpperCase();
+}
+tickClock(); setInterval(tickClock, 1000);
 
-    const byTeam = Object.entries(
-      records.reduce((m,r)=>{ m[r.team]=(m[r.team]||0)+1; return m; },{})
-    ).sort((a,b)=>b[1]-a[1]).slice(0,7);
+/* wire Copilot URL everywhere */
+document.querySelectorAll('[href="YOUR_COPILOT_AGENT_URL"]').forEach(el => el.href = COPILOT_URL);
 
-    if (teamChart) teamChart.destroy();
-    teamChart = new Chart(document.getElementById("team-chart"),{
-      type:"bar",
-      data:{
-        labels: byTeam.map(([t])=>t),
-        datasets:[{
-          data: byTeam.map(([,n])=>n), label:"Requests",
-          backgroundColor:"rgba(96,165,250,.2)",
-          borderColor:"rgba(96,165,250,.6)",
-          borderWidth:1, borderRadius:5, maxBarThickness:38,
-        }],
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{ display:false } },
-        scales:{
-          x:{ grid:{ display:false }, ticks:{ font:{size:11}, color:"#64748b" } },
-          y:{ grid:{ color:"rgba(255,255,255,.06)" }, ticks:{ font:{size:11}, color:"#94a3b8", precision:0 }, border:{ display:false } },
-        },
-      },
+/* ===================================================================
+   PARTICLES
+   =================================================================== */
+(function() {
+  const canvas = document.getElementById("particles-canvas");
+  const COLORS = ["#a78bfa","#60a5fa","#ff5638"];
+  for (let i = 0; i < 22; i++) {
+    const s  = document.createElement("span");
+    const sz = 2 + Math.random() * 3;
+    const c  = COLORS[Math.floor(Math.random() * COLORS.length)];
+    Object.assign(s.style, {
+      position:"absolute", left:Math.random()*100+"%", bottom:Math.random()*30+"%",
+      width:sz+"px", height:sz+"px", borderRadius:"50%",
+      background:c, boxShadow:c+" 0 0 6px", opacity:".5",
+      animationDelay:-(Math.random()*6)+"s",
+      animationDuration:(5+Math.random()*4)+"s",
     });
-
-    document.getElementById("status-mix").innerHTML = STAGES.map(s=>{
-      const pct = records.length ? Math.round((c[s]/records.length)*100) : 0;
-      return `
-        <div class="mix-item">
-          <div class="mix-row">
-            <span class="mix-name">${s}</span>
-            <span class="mix-nums">${c[s]} · ${pct}%</span>
-          </div>
-          <div class="mix-track">
-            <div class="mix-fill" style="width:${pct}%;background:${HUE[s]};box-shadow:${HUE[s]} 0 0 6px;"></div>
-          </div>
-        </div>`;
-    }).join("");
+    s.className = "particle";
+    canvas.appendChild(s);
   }
+})();
 
-  /* ================================================================
-     FILTER PILLS
-     ================================================================ */
-  function renderPills(c) {
-    const el = document.getElementById("filter-pills");
-    el.style.display = "flex";
-    el.innerHTML = ["All",...STAGES].map(s=>{
-      const on = activeFilter===s;
-      return `<button class="pill-btn${on?" active":""}" onclick="setFilter('${s}')">
-        ${s}${s!=="All"?`<span class="pill-count">${c[s]??0}</span>`:""}
+/* ===================================================================
+   CONVEYOR + READOUTS
+   =================================================================== */
+function renderConveyor(c) {
+  document.getElementById("conveyor").innerHTML = STAGES.map(s => {
+    const h = HUE[s];
+    return `
+      <div class="stage-item">
+        <span class="stage-ring-wrap">
+          <span class="stage-ring" style="border-color:${h}66;">
+            <span class="stage-spin spin-slow" style="background:conic-gradient(transparent 0%,${h}55 25%,transparent 50%,${h}55 75%,transparent 100%);
+              mask:radial-gradient(circle,transparent 56%,black 58%);-webkit-mask:radial-gradient(circle,transparent 56%,black 58%);"></span>
+            <span class="stage-ripple ripple-ring" style="border-color:${h};"></span>
+            <span class="stage-dot" style="background:${h};box-shadow:${h} 0 0 10px;"></span>
+          </span>
+        </span>
+        <span class="stage-count">${pad2(c[s]||0)}</span>
+        <span class="stage-label">${s}</span>
+      </div>`;
+  }).join("");
+}
+
+function renderReadouts(records, c) {
+  const open = (c.New||0) + (c["In Progress"]||0) + (c["On Hold"]||0);
+  document.getElementById("readouts").innerHTML = [
+    ["Total intake", pad2(records.length),   null],
+    ["Open",         pad2(open),             null],
+    ["Shipped",      pad2(c.Completed||0),   HUE.Completed],
+    ["Signal nominal","●",                   "#34d399"],
+  ].map(([k,v,accent]) => `
+    <div class="readout">
+      <span class="readout-key">${k}</span>
+      <span class="readout-val" style="${accent?`color:${accent}`:""}"> ${v}</span>
+    </div>`).join("");
+}
+
+/* ===================================================================
+   RIBBON
+   =================================================================== */
+function renderRibbon(records) {
+  if (!records.length) return;
+  const doubled = [...records, ...records];
+  document.getElementById("ribbon-track").innerHTML = doubled.map(r => {
+    const h = HUE[r.status] || "#94a3b8";
+    return `
+      <span class="ribbon-item">
+        <span class="ribbon-dot" style="background:${h};box-shadow:${h} 0 0 6px;"></span>
+        <span class="ribbon-num">${r.reqNumber}</span>
+        <span class="ribbon-title">${r.title}</span>
+        <span class="ribbon-status" style="color:${h};">${r.status}</span>
+        <span class="ribbon-sep">•</span>
+      </span>`;
+  }).join("");
+}
+
+/* ===================================================================
+   CHARTS
+   =================================================================== */
+function renderCharts(records, c) {
+  document.getElementById("charts-row").style.display = "grid";
+  document.getElementById("chart-total").textContent  = `${records.length} total`;
+
+  const byTeam = Object.entries(
+    records.reduce((m,r) => { m[r.team] = (m[r.team]||0)+1; return m; }, {})
+  ).sort((a,b) => b[1]-a[1]).slice(0,7);
+
+  if (teamChart) teamChart.destroy();
+  teamChart = new Chart(document.getElementById("team-chart"), {
+    type: "bar",
+    data: {
+      labels: byTeam.map(([t]) => t),
+      datasets: [{
+        data: byTeam.map(([,n]) => n), label: "Requests",
+        backgroundColor: "rgba(96,165,250,.2)", borderColor: "rgba(96,165,250,.6)",
+        borderWidth: 1, borderRadius: 5, maxBarThickness: 38,
+      }],
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend: { display:false } },
+      scales: {
+        x: { grid:{display:false}, ticks:{font:{size:11},color:"#64748b"} },
+        y: { grid:{color:"rgba(255,255,255,.06)"}, ticks:{font:{size:11},color:"#94a3b8",precision:0}, border:{display:false} },
+      },
+    },
+  });
+
+  document.getElementById("status-mix").innerHTML = STAGES.map(s => {
+    const pct = records.length ? Math.round(((c[s]||0)/records.length)*100) : 0;
+    return `
+      <div class="mix-item">
+        <div class="mix-row">
+          <span class="mix-name">${s}</span>
+          <span class="mix-nums">${c[s]||0} · ${pct}%</span>
+        </div>
+        <div class="mix-track">
+          <div class="mix-fill" style="width:${pct}%;background:${HUE[s]};box-shadow:${HUE[s]} 0 0 6px;"></div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ===================================================================
+   FILTER PILLS
+   =================================================================== */
+function renderPills(c) {
+  const el = document.getElementById("filter-pills");
+  el.style.display = "flex";
+  el.innerHTML =
+    `<span class="pill-lbl">Status</span>` +
+    ["All", ...STAGES].map(s => {
+      const active = activeFilter === s;
+      return `<button class="pill-btn${active?" active":""}" onclick="setFilter('${s}')">
+        ${s}${s!=="All" ? `<span class="pill-count">${c[s]??0}</span>` : ""}
       </button>`;
     }).join("");
-  }
-  function setFilter(f){ activeFilter=f; renderTable(); }
+}
 
-  /* ================================================================
-     TABLE
-     ================================================================ */
-  function renderTable() {
-    const c = counts(allRecords);
-    renderConveyor(c);
-    renderReadouts(allRecords,c);
-    renderPills(c);
+function setFilter(f) {
+  activeFilter = f;
+  renderTable();
+}
 
-    // update Jarvis briefing count
-    const openN = (c.New||0)+(c["In Progress"]||0)+(c["On Hold"]||0);
-    const jel = document.getElementById("jarvis-open-count");
-    if (jel) jel.textContent = openN;
+/* ===================================================================
+   TABLE RENDER
+   =================================================================== */
+function renderTable() {
+  const c = counts(allRecords);
+  renderConveyor(c);
+  renderReadouts(allRecords, c);
+  renderPills(c);
 
-    const q = (document.getElementById("search").value||"").toLowerCase().trim();
-    let rows = allRecords;
-    if (activeFilter!=="All") rows = rows.filter(r=>r.status===activeFilter);
-    if (q) rows = rows.filter(r=>(r.title+r.requester+r.team+r.lead).toLowerCase().includes(q));
+  // update briefing count
+  const openN = (c.New||0) + (c["In Progress"]||0) + (c["On Hold"]||0);
+  const jel = document.getElementById("jarvis-open-count");
+  if (jel) jel.textContent = openN;
 
-    const area = document.getElementById("table-area");
-    if (rows.length===0) {
-      area.innerHTML=`<div class="no-match">Nothing matches — clear the search or change the filter.</div>`;
-    } else {
-      area.innerHTML=`
-        <table>
-          <thead>
-            <tr>
-              <th>Request</th>
-              <th>Requester / Team</th>
-              <th>Lead</th>
-              <th>Status</th>
-              <th>Submitted</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(r=>{
-              const h = HUE[r.status]||"#94a3b8";
-              return `
-                <tr>
-                  <td>
-                    <div class="req-cell">
-                      <span class="avatar" style="background:${h}1e;color:${h};border:1px solid ${h}33;">${initials(r.requester)}</span>
-                      <span class="req-name-text">${r.title}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="req-person">${r.requester}</div>
-                    <div class="req-team-text">${r.team}</div>
-                  </td>
-                  <td><span class="req-lead-text">${r.lead}</span></td>
-                  <td>
-                    <span class="status-pill" style="border-color:${h}55;background:${h}1e;color:${h};">
-                      <span class="status-pip" style="background:${h};box-shadow:${h} 0 0 6px;"></span>
-                      ${r.status}
-                    </span>
-                  </td>
-                  <td><span class="req-date-text">${fmtDate(r.submitted)}</span></td>
-                </tr>`;
-            }).join("")}
-          </tbody>
-        </table>`;
-    }
+  const q    = (document.getElementById("search").value||"").toLowerCase().trim();
+  let rows   = allRecords;
+  if (activeFilter !== "All") rows = rows.filter(r => r.status === activeFilter);
+  if (q) rows = rows.filter(r => (r.title+r.requester+r.team+r.lead).toLowerCase().includes(q));
 
-    const footer = document.getElementById("footer-bar");
-    footer.style.display = "flex";
-    document.getElementById("footer-count").textContent =
-      `${rows.length} shown · ${allRecords.length} total`;
-  }
+  const area = document.getElementById("table-area");
 
-  /* ================================================================
-     SKELETON
-     ================================================================ */
-  function showSkeleton() {
-    document.getElementById("table-area").innerHTML =
-      Array.from({length:6}).map(()=>`
-        <div class="skeleton-row">
-          <div class="skel skel-avatar"></div>
-          <div class="skel-lines">
-            <div class="skel skel-line-a"></div>
-            <div class="skel skel-line-b"></div>
-          </div>
-          <div class="skel skel-pill"></div>
-        </div>`).join("");
-    renderConveyor({New:0,"In Progress":0,"On Hold":0,Completed:0});
-    renderReadouts([],{New:0,"In Progress":0,"On Hold":0,Completed:0});
+  if (rows.length === 0) {
+    area.innerHTML = `<div class="no-match">Nothing matches — clear the search or change the filter.</div>`;
+  } else {
+    area.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Request</th>
+            <th>Requester / Team</th>
+            <th>Lead</th>
+            <th>Status</th>
+            <th>Submitted</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => {
+            const h = HUE[r.status] || "#94a3b8";
+            return `
+              <tr>
+                <td>
+                  <div class="req-cell">
+                    <span class="avatar" style="background:${h}1e;color:${h};border:1px solid ${h}33;">${initials(r.requester)}</span>
+                    <span class="req-name-text">${r.title}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="req-person">${r.requester}</div>
+                  <div class="req-team-text">${r.team}</div>
+                </td>
+                <td><span class="req-lead-text">${r.lead}</span></td>
+                <td>
+                  <span class="status-pill" style="border-color:${h}55;background:${h}1e;color:${h};">
+                    <span class="status-pip" style="background:${h};box-shadow:${h} 0 0 6px;"></span>
+                    ${r.status}
+                  </span>
+                </td>
+                <td><span class="req-date-text">${fmtDate(r.submitted)}</span></td>
+              </tr>`;
+          }).join("")}
+        </tbody>
+      </table>`;
   }
 
-  /* ================================================================
-     ERROR / EMPTY
-     ================================================================ */
-  function showError(msg) {
-    document.getElementById("table-area").innerHTML=`
-      <div id="empty-state">
-        <div class="empty-icon" style="background:rgba(239,68,68,.1);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-            <path d="M12 9v4"/><path d="M12 17h.01"/>
-          </svg>
+  const footer = document.getElementById("footer-bar");
+  footer.style.display = "flex";
+  document.getElementById("footer-count").textContent =
+    `${rows.length} shown · ${allRecords.length} total`;
+}
+
+/* ===================================================================
+   SKELETON
+   =================================================================== */
+function showSkeleton() {
+  document.getElementById("table-area").innerHTML =
+    Array.from({length:6}).map(() => `
+      <div class="skeleton-row">
+        <div class="skel skel-avatar"></div>
+        <div class="skel-lines">
+          <div class="skel skel-line-a"></div>
+          <div class="skel skel-line-b"></div>
         </div>
-        <p class="empty-heading">Couldn't reach the list</p>
-        <p class="empty-body">${msg||`Check the Flow URL and that <code>mapItem()</code> field names match your SharePoint list's internal column names.`}</p>
-        <button class="retry-btn" onclick="load()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
-          </svg>
-          Try again
-        </button>
-      </div>`;
-  }
+        <div class="skel skel-pill"></div>
+      </div>`).join("");
+  renderConveyor({New:0,"In Progress":0,"On Hold":0,Completed:0});
+  renderReadouts([], {New:0,"In Progress":0,"On Hold":0,Completed:0});
+}
 
-  function showEmpty() {
-    document.getElementById("table-area").innerHTML=`
-      <div id="empty-state">
-        <div class="empty-icon" style="background:rgba(255,255,255,.05);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-        </div>
-        <p class="empty-heading">Waiting on your SharePoint list</p>
-        <p class="empty-body">Once the Flow returns items they land here — no records are stored in this page.</p>
-        <button class="retry-btn" onclick="load()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
-          </svg>
-          Refresh
-        </button>
-      </div>`;
-  }
-
-  /* ================================================================
-     FETCH + LOAD
-     ================================================================ */
-  async function load() {
-    showSkeleton();
-    document.getElementById("charts-row").style.display="none";
-    document.getElementById("filter-pills").style.display="none";
-    document.getElementById("footer-bar").style.display="none";
-
-    try {
-      const res = await fetch(FLOW_URL,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({}),
-      });
-      if (!res.ok) {
-        const detail = await res.text().catch(()=>"");
-        throw new Error(`Flow responded ${res.status}${detail?" — "+detail.slice(0,200):""}`);
-      }
-      const data = await res.json();
-      allRecords = (data.value||[]).map(mapItem);
-
-      if (allRecords.length===0) {
-        showEmpty();
-        renderConveyor({New:0,"In Progress":0,"On Hold":0,Completed:0});
-        renderReadouts([],{New:0,"In Progress":0,"On Hold":0,Completed:0});
-      } else {
-        const c = counts(allRecords);
-        renderRibbon(allRecords);
-        renderCharts(allRecords,c);
-        renderTable();
-      }
-    } catch(e) {
-      console.error(e);
-      showError(e.message);
-    }
-  }
-
-  load();
-</script>
-</body>
-</html>
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>J.A.R.V.I.S. · Intake Control Board · RCCB IT</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:      #0b0d12;
-      --card:    #11141b;
-      --card2:   #1a1f2b;
-      --border:  rgba(255,255,255,.08);
-      --border2: rgba(255,255,255,.12);
-      --text:    #e2e8f0;
-      --muted:   #94a3b8;
-      --dim:     #64748b;
-      --signal:  #ff5638;
-      --blue:    #60a5fa;
-      --purple:  #a78bfa;
-      --amber:   #f59e0b;
-      --green:   #34d399;
-      --sans: 'Inter', system-ui, sans-serif;
-      --mono: 'DM Mono', ui-monospace, monospace;
-    }
-
-    html, body { background: var(--bg); color: var(--text); }
-    body {
-      font-family: var(--sans);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ─── scrollbar ─────────────────────── */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--card); }
-    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #334155; }
-
-    /* ─── keyframes ─────────────────────── */
-    @keyframes hubSweep {
-      0%   { transform: translateX(-200px); }
-      100% { transform: translateX(110vw); }
-    }
-    @keyframes hubPulse {
-      0%, 100% { opacity: .3; transform: scale(1); }
-      50%       { opacity: 1;  transform: scale(1.3); }
-    }
-    @keyframes hubGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(255,86,56,.7); }
-      50%       { box-shadow: 0 0 0 6px rgba(255,86,56,0); }
-    }
-    @keyframes topBar {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    @keyframes auroraDrift {
-      0%   { transform: translate3d(0,0,0) scale(1); }
-      100% { transform: translate3d(-4%,2%,0) scale(1.05); }
-    }
-    @keyframes eqBar {
-      0%, 100% { transform: scaleY(.25); }
-      50%       { transform: scaleY(1); }
-    }
-    @keyframes ripple {
-      0%   { transform: scale(1); opacity: .7; }
-      100% { transform: scale(2.3); opacity: 0; }
-    }
-    @keyframes spinSlow { to { transform: rotate(360deg); } }
-    @keyframes particle {
-      0%   { transform: translate(0,0); opacity: 0; }
-      20%  { opacity: 1; }
-      100% { transform: translate(40px,-60px); opacity: 0; }
-    }
-    @keyframes shimmer {
-      0%   { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-    @keyframes marquee { to { transform: translateX(-50%); } }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes skelpulse { 0%,100%{opacity:.4} 50%{opacity:.9} }
-    @keyframes orbPing {
-      75%, 100% { transform: scale(2); opacity: 0; }
-    }
-
-    .hub-pulse  { animation: hubPulse 1.4s ease-in-out infinite, hubGlow 1.4s ease-in-out infinite; }
-    .hub-sweep  { animation: hubSweep 3.5s linear infinite; }
-    .spin-slow  { animation: spinSlow 18s linear infinite; }
-    .ripple-ring{ animation: ripple 2.4s ease-out infinite; }
-    .eq-bar     { transform-origin: bottom; animation: eqBar 1s ease-in-out infinite; }
-    .particle   { animation: particle 6s ease-out infinite; }
-    .fade-in-up { animation: fadeInUp 400ms ease-out both; }
-    .marquee    { animation: marquee 40s linear infinite; }
-    .orb-ping   { animation: orbPing 2.4s cubic-bezier(0,0,.2,1) infinite; }
-    .shimmer-text {
-      background: linear-gradient(90deg,#fff 0%,#fff 35%,rgba(255,86,56,.95) 50%,#fff 65%,#fff 100%);
-      background-size: 200% 100%;
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shimmer 6s linear infinite;
-    }
-    .lift {
-      transition: transform 220ms cubic-bezier(.2,0,.2,1), box-shadow 220ms, border-color 220ms;
-    }
-    .lift:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px -12px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
-      border-color: rgba(255,255,255,.14) !important;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation: none !important; transition: none !important; }
-    }
-
-    /* ─── sticky nav ────────────────────── */
-    #site-nav {
-      position: sticky; top: 0; z-index: 30;
-      background: rgba(11,13,18,.9);
-      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner {
-      max-width: 1100px; margin: 0 auto;
-      padding: 0 24px;
-      height: 48px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-brand {
-      display: flex; align-items: center; gap: 8px;
-      text-decoration: none;
-    }
-    .nav-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--signal);
-      box-shadow: 0 0 6px var(--signal);
-    }
-    .nav-label {
-      font-family: var(--mono);
-      font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
-      color: var(--text);
-    }
-
-    /* ─── hero header ───────────────────── */
-    #board-header {
-      position: relative; overflow: hidden;
-      background: radial-gradient(120% 140% at 12% -10%, #1a1f2b 0%, #0b0d12 55%);
-      border-bottom: 1px solid var(--border);
-    }
-    .top-bar-line {
-      position: absolute; top: 0; left: 0; right: 0; height: 2px; z-index: 2;
-      background: linear-gradient(90deg, transparent, var(--signal), transparent);
-      background-size: 200% 100%;
-      animation: topBar 4s linear infinite;
-    }
-    .hero-aurora {
-      position: absolute;
-      inset: -20% -10% auto -10%; height: 70%;
-      background:
-        radial-gradient(40% 60% at 20% 30%, rgba(96,165,250,.18) 0%, transparent 70%),
-        radial-gradient(35% 55% at 80% 20%, rgba(167,139,250,.16) 0%, transparent 70%),
-        radial-gradient(30% 50% at 50% 80%, rgba(255,86,56,.10) 0%, transparent 70%);
-      filter: blur(40px);
-      animation: auroraDrift 14s ease-in-out infinite alternate;
-      pointer-events: none;
-    }
-    .hero-grid {
-      position: absolute; inset: 0; pointer-events: none;
-      background-image:
-        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-      background-size: 44px 44px;
-      -webkit-mask-image: linear-gradient(to bottom,#000 30%,transparent 95%);
-      mask-image: linear-gradient(to bottom,#000 30%,transparent 95%);
-    }
-    #particles-canvas {
-      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-    }
-    .hero-inner {
-      position: relative;
-      max-width: 1100px; margin: 0 auto;
-      padding: 28px 24px 36px;
-    }
-
-    /* hero top bar */
-    .hero-topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .hero-org {
-      font-family: var(--mono); font-size: 11px;
-      letter-spacing: .22em; text-transform: uppercase; color: var(--dim);
-      display: inline-flex; align-items: center; gap: 8px;
-    }
-    .eq-wrap {
-      display: inline-flex; align-items: flex-end; gap: 2px;
-      height: 10px;
-    }
-    .eq-wrap span {
-      display: block; width: 2px; border-radius: 2px;
-      background: var(--signal); box-shadow: 0 0 4px var(--signal);
-    }
-    .hero-topright { display: flex; align-items: center; gap: 14px; }
-    #clock { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--dim); }
-    .live-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      border: 1px solid rgba(255,86,56,.35); border-radius: 999px;
-      padding: 4px 10px; background: rgba(255,86,56,.05);
-    }
-    .live-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--signal); box-shadow: 0 0 8px var(--signal);
-    }
-    .live-label {
-      font-family: var(--mono); font-size: 10px;
-      letter-spacing: .2em; text-transform: uppercase; color: #cbd5e1;
-    }
-
-    /* hero title row */
-    .hero-title-row {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      gap: 20px; flex-wrap: wrap; margin-bottom: 28px;
-    }
-    #board-title {
-      font-size: clamp(24px, 4vw, 40px); font-weight: 600;
-      color: #fff; letter-spacing: -.02em; line-height: 1.05;
-      margin-bottom: 8px;
-    }
-    #board-sub { font-size: 13px; color: var(--dim); line-height: 1.65; max-width: 520px; }
-
-    /* jarvis link button */
-    #jarvis-fab-link {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 10px 16px; border-radius: 10px;
-      border: 1px solid rgba(99,102,241,.35);
-      background: linear-gradient(135deg, rgba(26,29,46,.9), rgba(37,40,69,.9));
-      text-decoration: none; white-space: nowrap; flex-shrink: 0;
-      box-shadow: 0 8px 24px -8px rgba(99,102,241,.3);
-      transition: border-color .2s, box-shadow .2s, transform .2s;
-    }
-    #jarvis-fab-link:hover {
-      border-color: rgba(99,102,241,.6);
-      box-shadow: 0 12px 32px -8px rgba(99,102,241,.5);
-      transform: translateY(-1px);
-    }
-    .jarvis-orb-wrap {
-      position: relative; width: 36px; height: 36px; flex-shrink: 0;
-    }
-    .jarvis-orb-ping {
-      position: absolute; inset: 0; border-radius: 50%; opacity: .6;
-      background: radial-gradient(circle, var(--blue) 0%, transparent 70%);
-      animation: orbPing 2.4s ease-out infinite;
-    }
-    .jarvis-orb {
-      position: absolute; inset: 6px; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #c7d2fe, #6366f1 45%, #4338ca 80%);
-      box-shadow: rgba(99,102,241,.7) 0 0 12px, rgba(255,255,255,.6) 0 0 6px inset;
-    }
-    .jarvis-orb-glint {
-      position: absolute; border-radius: 50%; background: rgba(255,255,255,.8);
-      width: 7px; height: 7px; top: 8px; left: 10px; filter: blur(.5px);
-    }
-    .jarvis-fab-text { line-height: 1.25; }
-    .jarvis-fab-title { display: block; font-size: 13px; font-weight: 500; color: #e2e8f0; }
-    .jarvis-fab-sub   { display: block; font-size: 11px; color: rgba(99,102,241,.7); margin-top: 1px; font-family: var(--mono); }
-
-    /* conveyor */
-    .conveyor-wrap { position: relative; }
-    .conveyor-track {
-      position: absolute; left: 0; right: 0; top: 22px;
-      height: 2px; background: rgba(255,255,255,.18);
-      border-radius: 2px; overflow: hidden;
-    }
-    .conveyor-sweep {
-      position: absolute; top: 0; height: 2px; width: 180px;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,86,56,.4) 30%, var(--signal) 50%, rgba(255,86,56,.4) 70%, transparent 100%);
-      box-shadow: 0 0 10px var(--signal); filter: blur(.3px);
-    }
-    .conveyor-stages {
-      position: relative;
-      display: grid; grid-template-columns: repeat(4,1fr);
-    }
-    @media(max-width:560px){ .conveyor-stages{ grid-template-columns:repeat(2,1fr); row-gap:24px; } }
-
-    .stage-item {
-      display: flex; flex-direction: column;
-      align-items: center; text-align: center;
-    }
-    .stage-ring-wrap {
-      position: relative; width: 44px; height: 44px;
-    }
-    .stage-ring {
-      position: absolute; inset: 0; border-radius: 50%;
-      display: grid; place-items: center;
-      border: 1px solid;
-      background: var(--bg);
-    }
-    .stage-spin {
-      position: absolute; inset: -3px; border-radius: 50%;
-      pointer-events: none;
-    }
-    .stage-ripple {
-      position: absolute; inset: 0; border-radius: 50%;
-      border: 1px solid;
-      pointer-events: none;
-    }
-    .stage-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .stage-count {
-      font-family: var(--mono); font-size: 22px; font-weight: 600;
-      color: #fff; margin-top: 10px; font-variant-numeric: tabular-nums;
-    }
-    .stage-label {
-      font-family: var(--mono); font-size: 10px;
-      text-transform: uppercase; letter-spacing: .18em; color: var(--dim);
-      margin-top: 3px;
-    }
-
-    /* readouts */
-    .readouts {
-      display: flex; flex-wrap: wrap; gap: 8px 24px;
-      margin-top: 28px; padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-    .readout { display: flex; align-items: baseline; gap: 8px; }
-    .readout-key { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .18em; color: var(--dim); }
-    .readout-val { font-family: var(--mono); font-size: 13px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; }
-
-    /* ─── status ribbon ──────────────────── */
-    #status-ribbon {
-      position: relative; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,.3); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-      overflow: hidden;
-    }
-    .ribbon-fade-l {
-      pointer-events: none; position: absolute; inset-block: 0; left: 0; width: 80px;
-      background: linear-gradient(to right, var(--bg), transparent); z-index: 10;
-    }
-    .ribbon-fade-r {
-      pointer-events: none; position: absolute; inset-block: 0; right: 0; width: 80px;
-      background: linear-gradient(to left, var(--bg), transparent); z-index: 10;
-    }
-    .ribbon-track {
-      display: flex; align-items: center; gap: 32px;
-      padding: 10px 0; white-space: nowrap; will-change: transform;
-    }
-    .ribbon-item {
-      display: inline-flex; align-items: center; gap: 10px;
-    }
-    .ribbon-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .ribbon-num { font-family: var(--mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
-    .ribbon-title { font-size: 12px; font-weight: 500; color: #cbd5e1; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
-    .ribbon-status { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .18em; }
-    .ribbon-sep { color: #334155; }
-
-    /* ─── main ───────────────────────────── */
-    main {
-      max-width: 1100px; margin: 0 auto;
-      padding: 20px 24px 64px;
-      display: flex; flex-direction: column; gap: 16px;
-    }
-
-    /* ─── JARVIS briefing card ───────────── */
-    #jarvis-briefing {
-      position: relative; overflow: hidden;
-      border-radius: 16px;
-      border: 1px solid rgba(99,102,241,.2);
-      background: linear-gradient(135deg, #1a1d2e, #161827, #0f1119);
-      padding: 20px 24px;
-    }
-    .jb-glow-1 {
-      pointer-events: none; position: absolute;
-      top: -96px; right: -96px; width: 288px; height: 288px;
-      border-radius: 50%; opacity: .4;
-      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
-    }
-    .jb-glow-2 {
-      pointer-events: none; position: absolute;
-      bottom: -128px; left: -64px; width: 256px; height: 256px;
-      border-radius: 50%; opacity: .3;
-      background: radial-gradient(circle, #ec4899 0%, transparent 70%);
-    }
-    .jb-inner { position: relative; display: flex; gap: 16px; align-items: flex-start; }
-    .jb-avatar-col { flex-shrink: 0; }
-    .jb-name { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: rgba(165,180,252,.8); }
-    .jb-status { font-size: 11px; color: var(--dim); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
-    .jb-online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: hubPulse 2s ease-in-out infinite; }
-    .jb-message { font-size: 15px; line-height: 1.65; color: var(--text); min-height: 3em; }
-    .jb-actions { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .jb-btn-primary {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #fff;
-      background: linear-gradient(to right, #6366f1, #a855f7);
-      border: none; cursor: pointer; text-decoration: none;
-      box-shadow: 0 4px 12px rgba(99,102,241,.25);
-      transition: filter .15s;
-    }
-    .jb-btn-primary:hover { filter: brightness(1.1); }
-    .jb-btn-secondary {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
-      color: #e2e8f0; background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.15); cursor: pointer; text-decoration: none;
-      transition: background .15s;
-    }
-    .jb-btn-secondary:hover { background: rgba(255,255,255,.1); color: #fff; }
-
-    /* ─── charts row ─────────────────────── */
-    #charts-row { display: none; grid-template-columns: 3fr 2fr; gap: 16px; }
-    @media(max-width:700px){ #charts-row{ grid-template-columns:1fr; } }
-
-    .hud-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 18px 20px;
-    }
-    .hud-card-header {
-      display: flex; align-items: baseline; justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .hud-card-title { font-size: 13px; font-weight: 600; color: var(--text); }
-    .hud-card-sub { font-family: var(--mono); font-size: 11px; color: var(--dim); }
-    #team-chart-wrap { height: 200px; position: relative; }
-
-    /* status mix */
-    .mix-item { margin-bottom: 12px; }
-    .mix-item:last-child { margin-bottom: 0; }
-    .mix-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
-    .mix-name { font-weight: 500; color: var(--muted); }
-    .mix-nums { font-family: var(--mono); color: var(--dim); }
-    .mix-track { height: 5px; background: rgba(255,255,255,.05); border-radius: 99px; overflow: hidden; }
-    .mix-fill  { height: 100%; border-radius: 99px; transition: width .5s ease; }
-
-    /* ─── requests card ──────────────────── */
-    #requests-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden;
-    }
-    .req-header {
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 10px;
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
-    }
-    .req-header-left { display: flex; align-items: center; gap: 8px; }
-    .req-title-text { font-size: 13px; font-weight: 600; color: var(--text); }
-    #refresh-btn {
-      width: 28px; height: 28px; border-radius: 6px;
-      border: 1px solid var(--border2); background: transparent; cursor: pointer;
-      display: grid; place-items: center; color: var(--dim);
-      transition: background .15s, color .15s;
-    }
-    #refresh-btn:hover { background: rgba(255,255,255,.05); color: var(--muted); }
-    #refresh-btn svg { width: 13px; height: 13px; }
-
-    /* jarvis table button */
-    .req-jarvis-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 500; color: #fff;
-      background: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
-      border: none; cursor: pointer; text-decoration: none;
-      box-shadow: 0 4px 12px rgba(139,92,246,.25);
-      transition: filter .15s;
-    }
-    .req-jarvis-btn:hover { filter: brightness(1.1); }
-
-    /* search */
-    .search-wrap { position: relative; }
-    .search-wrap svg {
-      position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
-      width: 13px; height: 13px; color: var(--dim); pointer-events: none;
-    }
-    #search {
-      width: 160px; padding: 7px 10px 7px 28px; font-size: 12px;
-      font-family: var(--sans); border: 1px solid var(--border2); border-radius: 8px;
-      background: var(--bg); color: var(--text); outline: none;
-      transition: border-color .15s;
-    }
-    #search:focus { border-color: rgba(255,255,255,.3); }
-    #search::placeholder { color: var(--dim); }
-
-    /* pills */
-    #filter-pills { display: none; flex-wrap: wrap; gap: 6px; padding: 10px 18px; border-bottom: 1px solid var(--border); }
-    .pill-btn {
-      border-radius: 999px; padding: 4px 12px;
-      font-size: 12px; font-weight: 500;
-      border: 1px solid var(--border2); background: transparent; color: #cbd5e1;
-      cursor: pointer; transition: all .12s;
-    }
-    .pill-btn:hover { border-color: rgba(255,255,255,.4); color: #fff; }
-    .pill-btn.active { background: #fff; color: #0b0d12; border-color: #fff; }
-    .pill-count { font-family: var(--mono); margin-left: 5px; opacity: .6; font-size: 11px; }
-
-    /* table */
-    #table-area { overflow-x: auto; }
-    table { width: 100%; min-width: 580px; border-collapse: collapse; text-align: left; }
-    thead tr { border-bottom: 1px solid var(--border); }
-    th {
-      font-family: var(--mono); font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: .12em; color: var(--dim);
-      padding: 10px 16px;
-    }
-    tbody tr { border-bottom: 1px solid rgba(255,255,255,.05); transition: background .1s; cursor: pointer; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,.03); }
-    td { padding: 10px 16px; }
-
-    .req-cell { display: flex; align-items: center; gap: 10px; }
-    .avatar {
-      width: 32px; height: 32px; flex-shrink: 0; border-radius: 8px;
-      display: grid; place-items: center;
-      font-size: 10px; font-weight: 700;
-    }
-    .req-name-text  { font-size: 13px; font-weight: 500; color: var(--text); }
-    .req-person { font-size: 12px; color: #cbd5e1; }
-    .req-team-text { font-size: 12px; color: var(--dim); }
-    .req-lead-text  { font-size: 12px; color: var(--muted); }
-    .req-date-text  { font-family: var(--mono); font-size: 11px; color: var(--dim); }
-
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      border-radius: 999px; border: 1px solid;
-      padding: 2px 10px; font-size: 11px; font-weight: 500; white-space: nowrap;
-    }
-    .status-pip { width: 5px; height: 5px; border-radius: 50%; }
-
-    /* footer */
-    #footer-bar {
-      display: none; align-items: center; justify-content: space-between;
-      padding: 10px 18px; border-top: 1px solid var(--border);
-    }
-    #footer-count { font-family: var(--mono); font-size: 11px; color: var(--dim); }
-    .footer-src { font-size: 11px; color: var(--dim); display: inline-flex; align-items: center; gap: 4px; }
-    .footer-src svg { width: 11px; height: 11px; }
-
-    /* skeleton */
-    .skeleton-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,.04); }
-    .skel { background: rgba(255,255,255,.06); border-radius: 6px; animation: skelpulse 1.6s ease-in-out infinite; }
-    .skel-avatar { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
-    .skel-lines  { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-    .skel-line-a { height: 11px; width: 38%; }
-    .skel-line-b { height: 9px;  width: 55%; }
-    .skel-pill   { width: 72px; height: 20px; border-radius: 99px; }
-
-    /* empty / error */
-    #empty-state { padding: 56px 24px; text-align: center; }
-    .empty-icon { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; margin: 0 auto 14px; }
-    .empty-icon svg { width: 22px; height: 22px; }
-    .empty-heading { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-    .empty-body { font-size: 12px; color: var(--dim); max-width: 380px; margin: 0 auto 18px; line-height: 1.65; }
-    .empty-body code { font-family: var(--mono); font-size: 11px; background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 4px; }
-    .retry-btn {
-      display: inline-flex; align-items: center; gap: 6px; padding: 7px 18px;
-      border-radius: 8px; background: rgba(255,255,255,.08); color: var(--text);
-      border: 1px solid var(--border2); font-size: 13px; font-weight: 500; cursor: pointer;
-      transition: background .15s;
-    }
-    .retry-btn:hover { background: rgba(255,255,255,.12); }
-    .retry-btn svg { width: 14px; height: 14px; }
-    .no-match { padding: 48px 24px; text-align: center; font-size: 13px; color: var(--dim); }
-
-    /* ─── floating FAB ───────────────────── */
-    #jarvis-float {
-      position: fixed; bottom: 20px; right: 20px; z-index: 40;
-    }
-    #jarvis-float a {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 16px 8px 8px; border-radius: 999px;
-      background: linear-gradient(to right, #1a1d2e, #252845);
-      border: 1px solid rgba(99,102,241,.3);
-      box-shadow: 0 20px 32px -8px rgba(0,0,0,.6), 0 0 0 1px rgba(99,102,241,.1);
-      text-decoration: none;
-      transition: border-color .2s, box-shadow .2s, transform .2s;
-    }
-    #jarvis-float a:hover {
-      border-color: rgba(99,102,241,.6);
-      box-shadow: 0 20px 40px -8px rgba(99,102,241,.4);
-      transform: translateY(-2px);
-    }
-    .fab-orb-wrap { position: relative; width: 28px; height: 28px; flex-shrink: 0; }
-    .fab-orb-ping {
-      position: absolute; inset: 0; border-radius: 50%; opacity: .6;
-      background: radial-gradient(circle, var(--blue) 0%, transparent 70%);
-      animation: orbPing 2.4s ease-out infinite;
-    }
-    .fab-orb {
-      position: absolute; inset: 4px; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #c7d2fe, #6366f1 45%, #4338ca 80%);
-      box-shadow: rgba(99,102,241,.7) 0 0 12px;
-    }
-    .fab-text { line-height: 1.2; }
-    .fab-text-top { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: rgba(165,180,252,.8); }
-    .fab-text-bot { display: block; font-size: 12px; font-weight: 500; color: var(--text); }
-  </style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav id="site-nav">
-  <div class="nav-inner">
-    <a href="#" class="nav-brand">
-      <span class="nav-dot"></span>
-      <span class="nav-label">RCCB · Intake Control</span>
-    </a>
-  </div>
-</nav>
-
-<!-- HEADER -->
-<header id="board-header" class="fade-in-up">
-  <div class="top-bar-line"></div>
-  <div class="hero-aurora"></div>
-  <div class="hero-grid"></div>
-
-  <!-- particles -->
-  <div id="particles-canvas" aria-hidden="true"></div>
-
-  <div class="hero-inner">
-    <div class="hero-topbar">
-      <span class="hero-org">
-        <span class="eq-wrap" aria-hidden="true">
-          <span style="height:100%;animation-delay:0s;animation-duration:.8s"   class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.15s;animation-duration:1s" class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.3s;animation-duration:1.2s"class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.45s;animation-duration:.8s" class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.6s;animation-duration:1s"  class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.75s;animation-duration:1.2s"class="eq-bar"></span>
-          <span style="height:100%;animation-delay:-.9s;animation-duration:.8s" class="eq-bar"></span>
-        </span>
-        RCCB · IT&nbsp;Automation
-      </span>
-      <div class="hero-topright">
-        <span id="clock"></span>
-        <span class="live-badge">
-          <span class="live-dot hub-pulse"></span>
-          <span class="live-label">Live</span>
-        </span>
-      </div>
-    </div>
-
-    <div class="hero-title-row">
-      <div>
-        <h1 id="board-title">Intake <span class="shimmer-text">Control Board</span></h1>
-        <p id="board-sub">Every automation request the team takes in — from first submission to shipped — moving across one board.</p>
-      </div>
-      <!-- Replace href with your Copilot Studio agent URL -->
-      <a id="jarvis-fab-link" href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener">
-        <span class="jarvis-orb-wrap">
-          <span class="jarvis-orb-ping"></span>
-          <span class="jarvis-orb"></span>
-          <span class="jarvis-orb-glint"></span>
-        </span>
-        <span class="jarvis-fab-text">
-          <span class="jarvis-fab-title">Ask J.A.R.V.I.S.</span>
-          <span class="jarvis-fab-sub">Open AI agent ↗</span>
-        </span>
-      </a>
-    </div>
-
-    <!-- Conveyor -->
-    <div class="conveyor-wrap">
-      <div class="conveyor-track">
-        <div class="conveyor-sweep hub-sweep"></div>
-      </div>
-      <div class="conveyor-stages" id="conveyor"></div>
-    </div>
-
-    <div class="readouts" id="readouts"></div>
-  </div>
-</header>
-
-<!-- STATUS RIBBON -->
-<div id="status-ribbon">
-  <div class="ribbon-fade-l"></div>
-  <div class="ribbon-fade-r"></div>
-  <div class="ribbon-track marquee" id="ribbon-track"></div>
-</div>
-
-<!-- JARVIS BRIEFING -->
-<main>
-  <div id="jarvis-briefing" class="lift">
-    <div class="jb-glow-1"></div>
-    <div class="jb-glow-2"></div>
-    <div class="jb-inner">
-      <div class="jb-avatar-col">
-        <span class="jarvis-orb-wrap" style="width:44px;height:44px;display:block;">
-          <span class="jarvis-orb-ping" style="animation-duration:2.4s;"></span>
-          <span class="jarvis-orb" style="inset:6.6px;"></span>
-          <span class="jarvis-orb-glint" style="width:8px;height:8px;top:10px;left:12px;"></span>
-        </span>
-        <div class="jb-name" style="margin-top:8px;">Jarvis · AI Co-pilot</div>
-        <div class="jb-status"><span class="jb-online-dot"></span>Online</div>
-      </div>
-      <div style="flex:1;min-width:0;">
-        <div class="jb-message" id="jarvis-message">
-          Good morning. Automation intake board is live and connected to SharePoint. I'm monitoring <span id="jarvis-open-count">—</span> open requests. Want me to break it down?
-        </div>
-        <div class="jb-actions">
-          <a href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener" class="jb-btn-primary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
-            Get insights from Jarvis
-          </a>
-          <a href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener" class="jb-btn-secondary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-            Generate status report
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Charts -->
-  <div id="charts-row">
-    <div class="hud-card lift">
-      <div class="hud-card-header">
-        <span class="hud-card-title">Intake by team</span>
-        <span class="hud-card-sub" id="chart-total"></span>
-      </div>
-      <div id="team-chart-wrap"><canvas id="team-chart"></canvas></div>
-    </div>
-    <div class="hud-card lift">
-      <div class="hud-card-header"><span class="hud-card-title">Status mix</span></div>
-      <div id="status-mix"></div>
-    </div>
-  </div>
-
-  <!-- Requests table -->
-  <div id="requests-card">
-    <div class="req-header">
-      <div class="req-header-left">
-        <span class="req-title-text">Requests</span>
-        <button id="refresh-btn" title="Refresh from SharePoint" onclick="load()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-            <path d="M21 3v5h-5"/>
-            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-            <path d="M8 16H3v5"/>
-          </svg>
-        </button>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <a href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener" class="req-jarvis-btn">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg>
-          Chat with Jarvis to update your projects
-        </a>
-        <div class="search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-          </svg>
-          <input id="search" type="text" placeholder="Search…" oninput="renderTable()" />
-        </div>
-      </div>
-    </div>
-
-    <div id="filter-pills"></div>
-    <div id="table-area"></div>
-    <div id="footer-bar">
-      <span id="footer-count"></span>
-      <span class="footer-src">
-        Source: SharePoint
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+/* ===================================================================
+   ERROR / EMPTY
+   =================================================================== */
+function showError(msg) {
+  document.getElementById("table-area").innerHTML = `
+    <div id="empty-state">
+      <div class="empty-icon" style="background:rgba(239,68,68,.1);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+          <path d="M12 9v4"/><path d="M12 17h.01"/>
         </svg>
-      </span>
-    </div>
-  </div>
-</main>
+      </div>
+      <p class="empty-heading">Couldn't reach the list</p>
+      <p class="empty-body">${msg || "Check the Flow URL in the script and that your Power Automate flow is turned on."}</p>
+      <button class="retry-btn" onclick="load()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+        </svg>
+        Try again
+      </button>
+      ${DEBUG ? `<p style="margin-top:12px;font-family:var(--mono);font-size:11px;color:#64748b;">Add <code>?debug=1</code> to the URL and check the debug panel bottom-right.</p>` : ""}
+    </div>`;
+}
 
-<!-- FLOATING FAB -->
-<div id="jarvis-float">
-  <a href="YOUR_COPILOT_AGENT_URL" target="_blank" rel="noopener" aria-label="Ask Jarvis">
-    <span class="fab-orb-wrap">
-      <span class="fab-orb-ping"></span>
-      <span class="fab-orb"></span>
-    </span>
-    <span class="fab-text">
-      <span class="fab-text-top">Jarvis</span>
-      <span class="fab-text-bot">Ask anything</span>
-    </span>
-  </a>
-</div>
+function showEmpty() {
+  document.getElementById("table-area").innerHTML = `
+    <div id="empty-state">
+      <div class="empty-icon" style="background:rgba(255,255,255,.05);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <p class="empty-heading">No requests yet</p>
+      <p class="empty-body">The flow returned successfully but the SharePoint list is empty.</p>
+      <button class="retry-btn" onclick="load()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+        </svg>
+        Refresh
+      </button>
+    </div>`;
+}
 
-<script>
-  /* ================================================================
-     CONFIG — only these two things need editing
-     ================================================================ */
-  const FLOW_URL =
-    "https://a477fe69c32a4af79331a1752086c6.34.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a1a2a818907c499992855167195cb1e6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=L4dmM-57GdhVLTSDxZGwJ8FzJ5PwWfZq1ZKgfp54EVM";
+/* ===================================================================
+   LOAD — fetch from Power Automate flow
+   =================================================================== */
+async function load() {
+  showSkeleton();
+  document.getElementById("charts-row").style.display   = "none";
+  document.getElementById("filter-pills").style.display = "none";
+  document.getElementById("footer-bar").style.display   = "none";
 
-  // Your working field mapping — unchanged
-  function mapItem(it) {
-    const requesterObj = Array.isArray(it.field_2) ? it.field_2[0] : null;
-    const leadObj      = Array.isArray(it.field_7) ? it.field_7[0] : null;
-    const statusObj    = Array.isArray(it.field_8) ? it.field_8[0] : null;
-    return {
-      id:        it.ID,
-      title:     it.field_1 || "Untitled request",
-      requester: requesterObj?.DisplayName || "—",
-      team:      it.Team_x002f_Department1?.Value || "—",
-      lead:      leadObj?.Value || "—",
-      status:    statusObj?.Value || "New",
-      submitted: it.Created,
-      reqNumber: it.Title,
-      typeReq:   it.TypeofRequest?.Value,
-      useCase:   it.TypeofUseCase?.Value,
-      desc:      it.field_6,
-    };
-  }
-
-  /* ================================================================
-     CONSTANTS
-     ================================================================ */
-  const STAGES = ["New", "In Progress", "On Hold", "Completed"];
-  const HUE = {
-    "New":         "#60a5fa",
-    "In Progress": "#a78bfa",
-    "On Hold":     "#f59e0b",
-    "Completed":   "#34d399",
-  };
-
-  let allRecords   = [];
-  let activeFilter = "All";
-  let teamChart    = null;
-
-  /* ================================================================
-     UTILITIES
-     ================================================================ */
-  function pad2(n)     { return String(n).padStart(2,"0"); }
-  function initials(n) {
-    return (n||"?").split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase();
-  }
-  function fmtDate(v) {
-    if (!v) return "—";
-    const d = new Date(v);
-    return isNaN(d) ? String(v) : d.toLocaleDateString("en-US",{month:"short",day:"2-digit"});
-  }
-  function counts(records) {
-    const c = {New:0,"In Progress":0,"On Hold":0,Completed:0};
-    records.forEach(r=>{ if(c[r.status]!=null) c[r.status]++; });
-    return c;
-  }
-
-  /* ================================================================
-     CLOCK
-     ================================================================ */
-  function tickClock() {
-    document.getElementById("clock").textContent =
-      new Date().toLocaleString("en-US",{
-        month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"
-      }).toUpperCase();
-  }
-  tickClock(); setInterval(tickClock,1000);
-
-  /* ================================================================
-     PARTICLES
-     ================================================================ */
-  (function spawnParticles() {
-    const canvas = document.getElementById("particles-canvas");
-    const COLORS = ["#a78bfa","#60a5fa","#ff5638"];
-    for (let i = 0; i < 22; i++) {
-      const s = document.createElement("span");
-      const sz = 2 + Math.random() * 3;
-      const c = COLORS[Math.floor(Math.random()*COLORS.length)];
-      Object.assign(s.style, {
-        position: "absolute",
-        left: Math.random()*100 + "%",
-        bottom: Math.random()*30 + "%",
-        width: sz+"px", height: sz+"px",
-        borderRadius: "50%",
-        background: c, boxShadow: c+" 0 0 6px",
-        opacity: ".5",
-        animationDelay: -(Math.random()*6)+"s",
-        animationDuration: (5+Math.random()*4)+"s",
-      });
-      s.className = "particle";
-      canvas.appendChild(s);
-    }
-  })();
-
-  /* ================================================================
-     HEADER — conveyor + readouts
-     ================================================================ */
-  function renderConveyor(c) {
-    document.getElementById("conveyor").innerHTML = STAGES.map(s => {
-      const h = HUE[s];
-      return `
-        <div class="stage-item">
-          <span class="stage-ring-wrap" style="cursor:default">
-            <span class="stage-ring" style="border-color:${h}66;">
-              <span class="stage-spin" style="background:conic-gradient(transparent 0%,${h}55 25%,transparent 50%,${h}55 75%,transparent 100%);
-                -webkit-mask:radial-gradient(circle,transparent 56%,black 58%);mask:radial-gradient(circle,transparent 56%,black 58%);"
-                class="spin-slow"></span>
-              <span class="stage-ripple ripple-ring" style="border-color:${h};"></span>
-              <span class="stage-dot" style="background:${h};box-shadow:${h} 0 0 10px;"></span>
-            </span>
-          </span>
-          <span class="stage-count">${pad2(c[s]||0)}</span>
-          <span class="stage-label">${s}</span>
-        </div>`;
-    }).join("");
-  }
-
-  function renderReadouts(records, c) {
-    const open = (c.New||0)+(c["In Progress"]||0)+(c["On Hold"]||0);
-    document.getElementById("readouts").innerHTML = [
-      ["Total intake", pad2(records.length), null],
-      ["Open",         pad2(open),           null],
-      ["Shipped",      pad2(c.Completed||0), HUE.Completed],
-      ["Signal nominal", "●", "#34d399"],
-    ].map(([k,v,accent]) => `
-      <div class="readout">
-        <span class="readout-key">${k}</span>
-        <span class="readout-val" style="${accent?`color:${accent}`:""}"> ${v}</span>
-      </div>`).join("");
-  }
-
-  /* ================================================================
-     RIBBON — built from live data
-     ================================================================ */
-  function renderRibbon(records) {
-    if (!records.length) return;
-    const doubled = [...records, ...records]; // seamless loop
-    document.getElementById("ribbon-track").innerHTML = doubled.map(r => {
-      const h = HUE[r.status]||"#94a3b8";
-      return `
-        <span class="ribbon-item">
-          <span class="ribbon-dot" style="background:${h};box-shadow:${h} 0 0 6px;"></span>
-          <span class="ribbon-num">${r.reqNumber||r.id}</span>
-          <span class="ribbon-title">${r.title}</span>
-          <span class="ribbon-status" style="color:${h};">${r.status}</span>
-          <span class="ribbon-sep">•</span>
-        </span>`;
-    }).join("");
-  }
-
-  /* ================================================================
-     CHARTS
-     ================================================================ */
-  function renderCharts(records, c) {
-    document.getElementById("charts-row").style.display = "grid";
-    document.getElementById("chart-total").textContent  = `${records.length} total`;
-
-    const byTeam = Object.entries(
-      records.reduce((m,r)=>{ m[r.team]=(m[r.team]||0)+1; return m; },{})
-    ).sort((a,b)=>b[1]-a[1]).slice(0,7);
-
-    if (teamChart) teamChart.destroy();
-    teamChart = new Chart(document.getElementById("team-chart"),{
-      type:"bar",
-      data:{
-        labels: byTeam.map(([t])=>t),
-        datasets:[{
-          data: byTeam.map(([,n])=>n), label:"Requests",
-          backgroundColor:"rgba(96,165,250,.2)",
-          borderColor:"rgba(96,165,250,.6)",
-          borderWidth:1, borderRadius:5, maxBarThickness:38,
-        }],
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{ display:false } },
-        scales:{
-          x:{ grid:{ display:false }, ticks:{ font:{size:11}, color:"#64748b" } },
-          y:{ grid:{ color:"rgba(255,255,255,.06)" }, ticks:{ font:{size:11}, color:"#94a3b8", precision:0 }, border:{ display:false } },
-        },
-      },
+  try {
+    const res = await fetch(FLOW_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
     });
 
-    document.getElementById("status-mix").innerHTML = STAGES.map(s=>{
-      const pct = records.length ? Math.round((c[s]/records.length)*100) : 0;
-      return `
-        <div class="mix-item">
-          <div class="mix-row">
-            <span class="mix-name">${s}</span>
-            <span class="mix-nums">${c[s]} · ${pct}%</span>
-          </div>
-          <div class="mix-track">
-            <div class="mix-fill" style="width:${pct}%;background:${HUE[s]};box-shadow:${HUE[s]} 0 0 6px;"></div>
-          </div>
-        </div>`;
-    }).join("");
-  }
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      throw new Error(`Flow responded ${res.status}${detail ? " — " + detail.slice(0,200) : ""}`);
+    }
 
-  /* ================================================================
-     FILTER PILLS
-     ================================================================ */
-  function renderPills(c) {
-    const el = document.getElementById("filter-pills");
-    el.style.display = "flex";
-    el.innerHTML = ["All",...STAGES].map(s=>{
-      const on = activeFilter===s;
-      return `<button class="pill-btn${on?" active":""}" onclick="setFilter('${s}')">
-        ${s}${s!=="All"?`<span class="pill-count">${c[s]??0}</span>`:""}
-      </button>`;
-    }).join("");
-  }
-  function setFilter(f){ activeFilter=f; renderTable(); }
+    const data = await res.json();
+    debugLog("raw response (first item)", data.value?.[0]);
 
-  /* ================================================================
-     TABLE
-     ================================================================ */
-  function renderTable() {
-    const c = counts(allRecords);
-    renderConveyor(c);
-    renderReadouts(allRecords,c);
-    renderPills(c);
+    allRecords = (data.value || []).map(mapItem);
+    debugLog("mapped records (first item)", allRecords[0]);
 
-    // update Jarvis briefing count
-    const openN = (c.New||0)+(c["In Progress"]||0)+(c["On Hold"]||0);
-    const jel = document.getElementById("jarvis-open-count");
-    if (jel) jel.textContent = openN;
-
-    const q = (document.getElementById("search").value||"").toLowerCase().trim();
-    let rows = allRecords;
-    if (activeFilter!=="All") rows = rows.filter(r=>r.status===activeFilter);
-    if (q) rows = rows.filter(r=>(r.title+r.requester+r.team+r.lead).toLowerCase().includes(q));
-
-    const area = document.getElementById("table-area");
-    if (rows.length===0) {
-      area.innerHTML=`<div class="no-match">Nothing matches — clear the search or change the filter.</div>`;
+    if (allRecords.length === 0) {
+      showEmpty();
+      renderConveyor({New:0,"In Progress":0,"On Hold":0,Completed:0});
+      renderReadouts([], {New:0,"In Progress":0,"On Hold":0,Completed:0});
     } else {
-      area.innerHTML=`
-        <table>
-          <thead>
-            <tr>
-              <th>Request</th>
-              <th>Requester / Team</th>
-              <th>Lead</th>
-              <th>Status</th>
-              <th>Submitted</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(r=>{
-              const h = HUE[r.status]||"#94a3b8";
-              return `
-                <tr>
-                  <td>
-                    <div class="req-cell">
-                      <span class="avatar" style="background:${h}1e;color:${h};border:1px solid ${h}33;">${initials(r.requester)}</span>
-                      <span class="req-name-text">${r.title}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="req-person">${r.requester}</div>
-                    <div class="req-team-text">${r.team}</div>
-                  </td>
-                  <td><span class="req-lead-text">${r.lead}</span></td>
-                  <td>
-                    <span class="status-pill" style="border-color:${h}55;background:${h}1e;color:${h};">
-                      <span class="status-pip" style="background:${h};box-shadow:${h} 0 0 6px;"></span>
-                      ${r.status}
-                    </span>
-                  </td>
-                  <td><span class="req-date-text">${fmtDate(r.submitted)}</span></td>
-                </tr>`;
-            }).join("")}
-          </tbody>
-        </table>`;
+      const c = counts(allRecords);
+      renderRibbon(allRecords);
+      renderCharts(allRecords, c);
+      renderTable();
     }
 
-    const footer = document.getElementById("footer-bar");
-    footer.style.display = "flex";
-    document.getElementById("footer-count").textContent =
-      `${rows.length} shown · ${allRecords.length} total`;
+  } catch(e) {
+    console.error(e);
+    debugLog("error", e.message);
+    showError(e.message);
   }
+}
 
-  /* ================================================================
-     SKELETON
-     ================================================================ */
-  function showSkeleton() {
-    document.getElementById("table-area").innerHTML =
-      Array.from({length:6}).map(()=>`
-        <div class="skeleton-row">
-          <div class="skel skel-avatar"></div>
-          <div class="skel-lines">
-            <div class="skel skel-line-a"></div>
-            <div class="skel skel-line-b"></div>
-          </div>
-          <div class="skel skel-pill"></div>
-        </div>`).join("");
-    renderConveyor({New:0,"In Progress":0,"On Hold":0,Completed:0});
-    renderReadouts([],{New:0,"In Progress":0,"On Hold":0,Completed:0});
-  }
-
-  /* ================================================================
-     ERROR / EMPTY
-     ================================================================ */
-  function showError(msg) {
-    document.getElementById("table-area").innerHTML=`
-      <div id="empty-state">
-        <div class="empty-icon" style="background:rgba(239,68,68,.1);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-            <path d="M12 9v4"/><path d="M12 17h.01"/>
-          </svg>
-        </div>
-        <p class="empty-heading">Couldn't reach the list</p>
-        <p class="empty-body">${msg||`Check the Flow URL and that <code>mapItem()</code> field names match your SharePoint list's internal column names.`}</p>
-        <button class="retry-btn" onclick="load()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
-          </svg>
-          Try again
-        </button>
-      </div>`;
-  }
-
-  function showEmpty() {
-    document.getElementById("table-area").innerHTML=`
-      <div id="empty-state">
-        <div class="empty-icon" style="background:rgba(255,255,255,.05);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-        </div>
-        <p class="empty-heading">Waiting on your SharePoint list</p>
-        <p class="empty-body">Once the Flow returns items they land here — no records are stored in this page.</p>
-        <button class="retry-btn" onclick="load()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
-          </svg>
-          Refresh
-        </button>
-      </div>`;
-  }
-
-  /* ================================================================
-     FETCH + LOAD
-     ================================================================ */
-  async function load() {
-    showSkeleton();
-    document.getElementById("charts-row").style.display="none";
-    document.getElementById("filter-pills").style.display="none";
-    document.getElementById("footer-bar").style.display="none";
-
-    try {
-      const res = await fetch(FLOW_URL,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({}),
-      });
-      if (!res.ok) {
-        const detail = await res.text().catch(()=>"");
-        throw new Error(`Flow responded ${res.status}${detail?" — "+detail.slice(0,200):""}`);
-      }
-      const data = await res.json();
-      allRecords = (data.value||[]).map(mapItem);
-
-      if (allRecords.length===0) {
-        showEmpty();
-        renderConveyor({New:0,"In Progress":0,"On Hold":0,Completed:0});
-        renderReadouts([],{New:0,"In Progress":0,"On Hold":0,Completed:0});
-      } else {
-        const c = counts(allRecords);
-        renderRibbon(allRecords);
-        renderCharts(allRecords,c);
-        renderTable();
-      }
-    } catch(e) {
-      console.error(e);
-      showError(e.message);
-    }
-  }
-
-  load();
+load();
 </script>
 </body>
 </html>
