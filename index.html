@@ -552,19 +552,29 @@
     "https://a477fe69c32a4af79331a1752086c6.34.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a1a2a818907c499992855167195cb1e6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=L4dmM-57GdhVLTSDxZGwJ8FzJ5PwWfZq1ZKgfp54EVM";
 
  function mapItem(it) {
+  // Person field — array of user objects → grab DisplayName
+  const requesterObj = Array.isArray(it.field_2) ? it.field_2[0] : null;
+
+  // Project Lead — multi-choice array → grab .Value
+  const leadObj = Array.isArray(it.field_7) ? it.field_7[0] : null;
+
+  // Request Status — multi-choice array → grab .Value
+  const statusObj = Array.isArray(it.field_8) ? it.field_8[0] : null;
+
   return {
-    id:        it.Id,
-    title:     it.RequestTitle  || it.Title || "Untitled request",
-    requester: it.Requestor     || "—",
-    team:      it.TeamDepartment|| "—",
-    lead:      it.ProjectLead   || "—",
-    status:    it.RequestStatus || "New",
+    id:        it.ID,
+    title:     it.field_1 || "Untitled request",
+    requester: requesterObj?.DisplayName || "—",
+    team:      it.Team_x002f_Department1?.Value || "—",
+    lead:      leadObj?.Value || "—",
+    status:    statusObj?.Value || "New",
     submitted: it.Created,
-    // bonus fields available if you want to show them later:
-    reqNumber: it.Title,            // "REQ-0015"
-    typeReq:   it.TypeofRequest,
-    useCase:   it.TypeofUseCase,
-    desc:      it.Description,
+
+    // bonus fields ready to use
+    reqNumber: it.Title,                       // "REQ-0019"
+    typeReq:   it.TypeofRequest?.Value,        // "Create a New Automation..."
+    useCase:   it.TypeofUseCase?.Value,        // "Workflow Automation"
+    desc:      it.field_6,                     // description text
   };
 }
 
