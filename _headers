@@ -1,0 +1,2 @@
+/*
+  Content-Security-Policy: default-src 'self'; connect-src 'self' https: https://*.powerplatform.com https://*.environment.api.powerplatform.com https://*.powerautomate.com https://*.logic.azure.com; img-src 'self' data:; style-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:
