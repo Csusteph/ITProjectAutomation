@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-    <script type="module">import { injectIntoGlobalHook } from "/@react-refresh";
-injectIntoGlobalHook(window);
-window.$RefreshReg$ = () => {};
-window.$RefreshSig$ = () => (type) => type;</script>
-
+    <!-- Removed dev-only react-refresh injection for production -->
     
 
     <meta charset="UTF-8">
@@ -35,81 +31,7 @@ window.$RefreshSig$ = () => (type) => type;</script>
         }
       })(window.location);
     </script>
-    <script type="module">
-(() => {
-  const STATUS_PATH = '/__dev/reload/status';
-  const POLL_INTERVAL = 2000;
-  let currentVersion = 19;
-  let isPolling = false;
-  
-  function applyAllCSS(v) {
-    document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-      const url = new URL(link.href, location.origin);
-      url.searchParams.set('v', v);
-      const clone = link.cloneNode();
-      clone.href = url.toString();
-      clone.addEventListener('load', () => link.remove(), { once: true });
-      link.after(clone);
-    });
-  }
-  
-  async function pollStatus() {
-    if (isPolling) return; // Prevent overlapping polls
-    isPolling = true;
-    
-    try {
-      const response = await fetch(STATUS_PATH, {
-        cache: 'no-cache',
-        headers: { 'Accept': 'application/json' }
-      });
-      
-      if (!response.ok) {
-        console.warn('[dev-reload] Poll failed:', response.status);
-        return;
-      }
-      
-      const status = await response.json();
-      
-      // Check for build errors
-      if (status.error) {
-        console.error('[dev-reload][build-error]', status.error);
-        return;
-      }
-      
-      // Check if version changed
-      if (status.version > currentVersion) {
-        console.log('[dev-reload] New build detected, version:', status.version);
-        currentVersion = status.version;
-        
-        if (status.cssOnly) {
-          console.log('[dev-reload] CSS-only update, refreshing stylesheets');
-          applyAllCSS(status.version);
-        } else {
-          console.log('[dev-reload] Full reload required');
-          location.reload();
-        }
-      }
-    } catch (error) {
-      console.warn('[dev-reload] Poll error:', error);
-    } finally {
-      isPolling = false;
-    }
-  }
-  
-  // Start polling
-  const pollTimer = setInterval(pollStatus, POLL_INTERVAL);
-  
-  // Initial poll
-  pollStatus();
-  
-  // Expose API
-  (window).__devReload = {
-    version: () => currentVersion,
-    forceReload: () => location.reload(),
-  };
-  
-  console.log('[dev-reload] Polling started with interval:', POLL_INTERVAL, 'ms');
-})();</script>
+    <!-- Removed dev-reload polling script (Vite dev server) for production -->
   <style type="text/css" data-vite-dev-id="/workspace/app/src/index.css">/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 @layer theme, base, components, utilities;
